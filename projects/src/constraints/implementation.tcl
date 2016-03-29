@@ -50,7 +50,6 @@ proc write_constraints_file { str_filepath } {
 
   #ad9361 related constrains
   #if {($::data_source == "ADC") || ($::data_sink == "DAC")} {
-  if 1 {
     #axi_ad9361
     puts $constraints_file {set_property -dict {PACKAGE_PIN K39 IOSTANDARD LVDS DIFF_TERM 1} [get_ports rx_clk_in_p] }
     puts $constraints_file {set_property -dict {PACKAGE_PIN K40 IOSTANDARD LVDS DIFF_TERM 1} [get_ports rx_clk_in_n] }
@@ -117,8 +116,7 @@ proc write_constraints_file { str_filepath } {
     # master/projects/fmcomms2/vc707/system_constr.xdc
     puts $constraints_file {create_clock -name rx_clk -period 4 [get_ports rx_clk_in_p]}
     puts $constraints_file {create_clock -name ad9361_clk -period 4 [get_pins block_design_i/axi_ad9361_0/clk]}
-
-  }
+  #}
 
 
 close $constraints_file
