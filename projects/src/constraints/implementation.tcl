@@ -1,56 +1,56 @@
 proc write_constraints_file { str_filepath } {
   set constraints_file [open $str_filepath  w+]
 
-  if {$::cpri_clk == "MMCM"} {
-    # "Locked" indication on LED
-    puts $constraints_file {set_property PACKAGE_PIN AM39 [get_ports GPIO_LED_0]}
-    puts $constraints_file {set_property IOSTANDARD LVCMOS18 [get_ports GPIO_LED_0]}
+  #if {$::cpri_clk == "MMCM"} {
+  #  # "Locked" indication on LED
+  #  puts $constraints_file {set_property PACKAGE_PIN AM39 [get_ports GPIO_LED_0]}
+  #  puts $constraints_file {set_property IOSTANDARD LVCMOS18 [get_ports GPIO_LED_0]}
 
-  } elseif { $::cpri_clk == "SI5324" } {
+  #} elseif { $::cpri_clk == "SI5324" } {
 
-    # Si5324 Input clocks
-    puts $constraints_file {set_property PACKAGE_PIN AW32 [get_ports si5324_ckin_clk_p]}
-    puts $constraints_file {set_property IOSTANDARD LVDS [get_ports si5324_ckin_clk_p]}
-    puts $constraints_file {set_property PACKAGE_PIN AW33 [get_ports si5324_ckin_clk_n]}
-    puts $constraints_file {set_property IOSTANDARD LVDS [get_ports si5324_ckin_clk_n]}
+  #  # Si5324 Input clocks
+  #  puts $constraints_file {set_property PACKAGE_PIN AW32 [get_ports si5324_ckin_clk_p]}
+  #  puts $constraints_file {set_property IOSTANDARD LVDS [get_ports si5324_ckin_clk_p]}
+  #  puts $constraints_file {set_property PACKAGE_PIN AW33 [get_ports si5324_ckin_clk_n]}
+  #  puts $constraints_file {set_property IOSTANDARD LVDS [get_ports si5324_ckin_clk_n]}
 
-    # Si5324 output clocks
-    puts $constraints_file {set_property PACKAGE_PIN AD8 [get_ports si5324_ckout_clk_p]}
-    puts $constraints_file {set_property PACKAGE_PIN AD7 [get_ports si5324_ckout_clk_n]}
+  #  # Si5324 output clocks
+  #  puts $constraints_file {set_property PACKAGE_PIN AD8 [get_ports si5324_ckout_clk_p]}
+  #  puts $constraints_file {set_property PACKAGE_PIN AD7 [get_ports si5324_ckout_clk_n]}
 
-    # Si5324 reset pin
-    puts $constraints_file {set_property PACKAGE_PIN AT36 [get_ports si5324_rst]}
-    puts $constraints_file {set_property IOSTANDARD LVCMOS18 [get_ports si5324_rst]}
-  }
+  #  # Si5324 reset pin
+  #  puts $constraints_file {set_property PACKAGE_PIN AT36 [get_ports si5324_rst]}
+  #  puts $constraints_file {set_property IOSTANDARD LVCMOS18 [get_ports si5324_rst]}
+  #}
 
   # When the AD9361 is used, output the Si5324 clock passing through the FPGA
   # to the SMA pin
   # Connect to "USER_SMA_CLOCK_P"
-  puts $constraints_file {\
-    set_property PACKAGE_PIN AJ32 [get_ports si5324_out_clk_ext]\
-  }
-  puts $constraints_file {\
-    set_property IOSTANDARD LVCMOS18 [get_ports si5324_out_clk_ext]\
-  }
+  #puts $constraints_file {\
+  #  set_property PACKAGE_PIN AJ32 [get_ports si5324_out_clk_ext]\
+  #}
+  #puts $constraints_file {\
+  #  set_property IOSTANDARD LVCMOS18 [get_ports si5324_out_clk_ext]\
+  #}
 
-  if {$::output_clock == 1} {
-    # Connect to "USER_SMA_GPIO_P"
-    puts $constraints_file {set_property PACKAGE_PIN AN31 [get_ports cpri_clk_out]}
-    puts $constraints_file {set_property IOSTANDARD LVCMOS18 [get_ports cpri_clk_out]}
+  #if {$::output_clock == 1} {
+  #  # Connect to "USER_SMA_GPIO_P"
+  #  puts $constraints_file {set_property PACKAGE_PIN AN31 [get_ports cpri_clk_out]}
+  #  puts $constraints_file {set_property IOSTANDARD LVCMOS18 [get_ports cpri_clk_out]}
 
-    if {$::sync_mode == "PTP"} {
-      # Connect to "USER_SMA_GPIO_N"
-      puts $constraints_file {set_property PACKAGE_PIN AP31 [get_ports clk8k]}
-      puts $constraints_file {set_property IOSTANDARD LVCMOS18 [get_ports clk8k]}
-    }
-  }
+  #  if {$::sync_mode == "PTP"} {
+  #    # Connect to "USER_SMA_GPIO_N"
+  #    puts $constraints_file {set_property PACKAGE_PIN AP31 [get_ports clk8k]}
+  #    puts $constraints_file {set_property IOSTANDARD LVCMOS18 [get_ports clk8k]}
+  #  }
+  #}
 
   # False pahts
-  puts $constraints_file {set_false_path -through block_design_i/radio_over_ethernet_0/U0/cpriSource_i/rst_internal}
+  #puts $constraints_file {set_false_path -through block_design_i/radio_over_ethernet_0/U0/cpriSource_i/rst_internal}
 
   #ad9361 related constrains
-  if {($::data_source == "ADC") || ($::data_sink == "DAC")} {
-
+  #if {($::data_source == "ADC") || ($::data_sink == "DAC")} {
+  if 1 {
     #axi_ad9361
     puts $constraints_file {set_property -dict {PACKAGE_PIN K39 IOSTANDARD LVDS DIFF_TERM 1} [get_ports rx_clk_in_p] }
     puts $constraints_file {set_property -dict {PACKAGE_PIN K40 IOSTANDARD LVDS DIFF_TERM 1} [get_ports rx_clk_in_n] }
