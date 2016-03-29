@@ -61,3 +61,16 @@ set_property -dict [list CONFIG.NUM_PORTS {3}] [get_bd_cells microblaze_0_xlconc
 connect_bd_net [get_bd_pins axi_ethernet_0/interrupt] [get_bd_pins microblaze_0_xlconcat/In0]
 connect_bd_net [get_bd_pins axi_ethernet_0_dma/mm2s_introut] [get_bd_pins microblaze_0_xlconcat/In1]
 connect_bd_net [get_bd_pins axi_ethernet_0_dma/s2mm_introut] [get_bd_pins microblaze_0_xlconcat/In2]
+
+startgroup
+create_bd_cell -type ip -vlnv xilinx.com:ip:axi_uartlite:2.0 axi_uartlite_0
+endgroup
+startgroup
+apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {Master "/microblaze_0 (Periph)" Clk "Auto" }  [get_bd_intf_pins axi_uartlite_0/S_AXI]
+</axi_uartlite_0/S_AXI/Reg> is being mapped into </microblaze_0/Data> at <0x40600000[ 64K ]>
+apply_bd_automation -rule xilinx.com:bd_rule:board -config {Board_Interface "rs232_uart" }  [get_bd_intf_pins axi_uartlite_0/UART]
+INFO: [board_rule:/axi_uartlite_0-100] set_property CONFIG.USE_BOARD_FLOW true [get_bd_cells /axi_uartlite_0]
+INFO: [board_rule:/axi_uartlite_0-100] set_property CONFIG.UARTLITE_BOARD_INTERFACE rs232_uart [get_bd_cells /axi_uartlite_0]
+INFO: [board_rule:/axi_uartlite_0-100] create_bd_intf_port -mode Master -vlnv xilinx.com:interface:uart_rtl:1.0 rs232_uart
+INFO: [board_rule:/axi_uartlite_0-100] connect_bd_intf_net /rs232_uart /axi_uartlite_0/UART
+endgroup
