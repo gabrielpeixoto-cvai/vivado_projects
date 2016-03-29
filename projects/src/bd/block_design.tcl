@@ -15,10 +15,10 @@ set fixed_interrupts 3
 
 set no_interrupts $fixed_interrupts
 
-if {!$::bypass_fronthaul} {
-	# 2 extra interrupt ports when AXI Ethernet is present
-	incr no_interrupts 2;
-}
+#if {!$::bypass_fronthaul} {
+#	# 2 extra interrupt ports when AXI Ethernet is present
+#	incr no_interrupts 2;
+#}
 
 #if {$::cpri_clk == "SI5324"} {
 #		# 1 extra interrupt ports for the IIC when SI5324 is used
@@ -120,10 +120,10 @@ apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {Slave "/microblaze_0_
 
 # When DMA is used as data source, in order to prevent preemption by interrupts
 # of lower priority, nested interrupts are enabled in the interrupt controller.
-if {$::data_source == "DMA"} {
-	set_property -dict [list CONFIG.C_HAS_ILR {1}] \
-	[get_bd_cells microblaze_0_axi_intc]
-}
+#if {$::data_source == "DMA"} {
+#	set_property -dict [list CONFIG.C_HAS_ILR {1}] \
+#	[get_bd_cells microblaze_0_axi_intc]
+#}
 
 # Uartlite
 
@@ -211,72 +211,15 @@ apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {Master "/microblaze_0
 #	apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {Master "/microblaze_0 (Periph)" Clk "Auto" }  [get_bd_intf_pins axi_ethernet_0_fifo/S_AXI]
 #}
 apply_bd_automation -rule xilinx.com:bd_rule:axi_ethernet -config {PHY_TYPE "SGMII" FIFO_DMA "DMA" }  [get_bd_cells axi_ethernet_0]
-#
-#######################################################################
-##
-## UFA13 Radio over Ethernet IP
-## 	Vivado was crashing when the IP was added before the previous
-## blocks. When added in the following order (after all block and
-## connection automations) it works in 2015.2.
-##
-#######################################################################
-#create_bd_cell -type ip -vlnv LaPS:user:radio_over_ethernet:1.0 radio_over_ethernet_0
-#apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {Master "/microblaze_0 (Periph)" Clk "Auto" }  [get_bd_intf_pins radio_over_ethernet_0/S_AXI]
-## Set CPRI Source and Sink
-#set_property -dict [list CONFIG.data_source "$::data_source"] [get_bd_cells radio_over_ethernet_0]
-#set_property -dict [list CONFIG.data_sink "$::data_sink"] [get_bd_cells radio_over_ethernet_0]
-## Define whether or not to bypass the Fronthaul
-#set_property -dict [list CONFIG.bypass_fronthaul "$::bypass_fronthaul"] [get_bd_cells radio_over_ethernet_0]
-#
-#if {$::data_source == "DMA" || $::data_sink == "DMA"} {
-#	# If the CPRI mode determines DMA source, the RoE IP requires an
-#	# AXI DMA instance
-#	create_bd_cell -type ip -vlnv xilinx.com:ip:axi_dma:7.1 axi_dma_0
-#	# Configure the DMA with scatter gather mode enabled.
-#	# Note "Read Channel" is relative to the memory, namely that the memory is
-#	# read and the data goes via AXI Streaming to the downstream processing chain.
-#	# The opposite for the "Write Channel". The two channels are enabled based
-#	# on the conditions for the Data Source and Data Sink in the RoE.
-#	set_property -dict [list CONFIG.c_include_sg {1} \
-#	CONFIG.c_include_mm2s [expr {$::data_source eq "DMA" ? "1" : "0"}] \
-#	CONFIG.c_mm2s_burst_size {128} \
-#	CONFIG.c_sg_length_width {23} \
-#	CONFIG.c_include_s2mm [expr {$::data_sink eq "DMA" ? "1" : "0"}] \
-#	CONFIG.c_sg_include_stscntrl_strm {0}] [get_bd_cells axi_dma_0]
-#
-#	# Then apply block automation
-#	# Connect the AXI-Lite interface to the Microblaze via the AXI interconnect
-#	apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config \
-#	{Master "/microblaze_0 (Periph)" Clk "Auto" } \
-#	[get_bd_intf_pins axi_dma_0/S_AXI_LITE]
-#
-#	# Connect the Scatter Gather Engine to the MIG
-#	apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config \
-#	{Slave "/mig_7series_0/S_AXI" Clk "Auto" }  \
-#	[get_bd_intf_pins axi_dma_0/M_AXI_SG]
-#
-#	# Connect the MM2S interface to the MIG via the AXI interconnect
-#	if {$::data_source == "DMA"} {
-#	  apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config \
-#		{Slave "/mig_7series_0/S_AXI" Clk "Auto" } \
-#		[get_bd_intf_pins axi_dma_0/M_AXI_MM2S]
-#
-#		# Connect the RoE IP to the AXI DMA
-#		connect_bd_intf_net [get_bd_intf_pins axi_dma_0/M_AXIS_MM2S] \
-#		[get_bd_intf_pins radio_over_ethernet_0/s_axis_dma]
-#	}
-#
-#	# Connect the S2MM interface to the MIG via the AXI interconnect
-#	if {$::data_sink == "DMA"} {
-#		apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config \
-#		{Slave "/mig_7series_0/S_AXI" Clk "Auto" } \
-#		[get_bd_intf_pins axi_dma_0/M_AXI_S2MM]
-#
-#		connect_bd_intf_net [get_bd_intf_pins axi_dma_0/S_AXIS_S2MM] \
-#		[get_bd_intf_pins radio_over_ethernet_0/m_axis_dma]
-#	}
-#}
-#
+
+
+apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {Master "/microblaze_0 (Periph)" Clk "Auto" }  [get_bd_intf_pins axi_ethernet_0/s_axi]
+apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {Master "/microblaze_0 (Periph)" Clk "Auto" }  [get_bd_intf_pins axi_ethernet_0_dma/S_AXI_LITE]
+apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {Slave "/mig_7series_0/S_AXI" Clk "Auto" }  [get_bd_intf_pins axi_ethernet_0_dma/M_AXI_SG]
+apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {Slave "/mig_7series_0/S_AXI" Clk "Auto" }  [get_bd_intf_pins axi_ethernet_0_dma/M_AXI_MM2S]
+
+apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {Slave "/mig_7series_0/S_AXI" Clk "Auto" }  [get_bd_intf_pins axi_ethernet_0_dma/M_AXI_S2MM]
+
 # FMcomms2 IF Blocks
 #if {($::data_source == "ADC") || ($::data_sink == "DAC")} {
 	# Create instance: ad9361_comm_0, and set properties
@@ -305,93 +248,6 @@ apply_bd_automation -rule xilinx.com:bd_rule:axi_ethernet -config {PHY_TYPE "SGM
 	apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {Master "/microblaze_0 (Periph)" Clk "Auto" }  [get_bd_intf_pins fmcomms2_spi/AXI_LITE]
 #}
 
-# FMcomms2 connections
-#if {$::data_source == "ADC"} {
-#  connect_bd_net -net axi_ad9361_0_adc_data_i0 [get_bd_pins axi_ad9361_0/adc_data_i0] [get_bd_pins radio_over_ethernet_0/rx_i0_data]
-#  connect_bd_net -net axi_ad9361_0_adc_data_i1 [get_bd_pins axi_ad9361_0/adc_data_i1] [get_bd_pins radio_over_ethernet_0/rx_i1_data]
-#  connect_bd_net -net axi_ad9361_0_adc_data_q0 [get_bd_pins axi_ad9361_0/adc_data_q0] [get_bd_pins radio_over_ethernet_0/rx_q0_data]
-#  connect_bd_net -net axi_ad9361_0_adc_data_q1 [get_bd_pins axi_ad9361_0/adc_data_q1] [get_bd_pins radio_over_ethernet_0/rx_q1_data]
-#  connect_bd_net -net axi_ad9361_0_adc_enable_i0 [get_bd_pins axi_ad9361_0/adc_enable_i0] [get_bd_pins radio_over_ethernet_0/rx_i0_enable]
-#  connect_bd_net -net axi_ad9361_0_adc_enable_i1 [get_bd_pins axi_ad9361_0/adc_enable_i1] [get_bd_pins radio_over_ethernet_0/rx_i1_enable]
-#  connect_bd_net -net axi_ad9361_0_adc_enable_q0 [get_bd_pins axi_ad9361_0/adc_enable_q0] [get_bd_pins radio_over_ethernet_0/rx_q0_enable]
-#  connect_bd_net -net axi_ad9361_0_adc_enable_q1 [get_bd_pins axi_ad9361_0/adc_enable_q1] [get_bd_pins radio_over_ethernet_0/rx_q1_enable]
-#  connect_bd_net -net axi_ad9361_0_adc_valid_i0 [get_bd_pins axi_ad9361_0/adc_valid_i0] [get_bd_pins radio_over_ethernet_0/rx_i0_valid]
-#  connect_bd_net -net axi_ad9361_0_adc_valid_i1 [get_bd_pins axi_ad9361_0/adc_valid_i1] [get_bd_pins radio_over_ethernet_0/rx_i1_valid]
-#  connect_bd_net -net axi_ad9361_0_adc_valid_q0 [get_bd_pins axi_ad9361_0/adc_valid_q0] [get_bd_pins radio_over_ethernet_0/rx_q0_valid]
-#  connect_bd_net -net axi_ad9361_0_adc_valid_q1 [get_bd_pins axi_ad9361_0/adc_valid_q1] [get_bd_pins radio_over_ethernet_0/rx_q1_valid]
-#}
-#
-#if {$::data_sink == "DAC"} {
-#  connect_bd_net -net axi_ad9361_0_dac_enable_i0 [get_bd_pins axi_ad9361_0/dac_enable_i0] [get_bd_pins radio_over_ethernet_0/tx_i0_enable]
-#  connect_bd_net -net axi_ad9361_0_dac_enable_i1 [get_bd_pins axi_ad9361_0/dac_enable_i1] [get_bd_pins radio_over_ethernet_0/tx_i1_enable]
-#  connect_bd_net -net axi_ad9361_0_dac_enable_q0 [get_bd_pins axi_ad9361_0/dac_enable_q0] [get_bd_pins radio_over_ethernet_0/tx_q0_enable]
-#  connect_bd_net -net axi_ad9361_0_dac_enable_q1 [get_bd_pins axi_ad9361_0/dac_enable_q1] [get_bd_pins radio_over_ethernet_0/tx_q1_enable]
-#  connect_bd_net -net axi_ad9361_0_dac_valid_i0 [get_bd_pins axi_ad9361_0/dac_valid_i0] [get_bd_pins radio_over_ethernet_0/tx_i0_valid]
-#  connect_bd_net -net axi_ad9361_0_dac_valid_i1 [get_bd_pins axi_ad9361_0/dac_valid_i1] [get_bd_pins radio_over_ethernet_0/tx_i1_valid]
-#  connect_bd_net -net axi_ad9361_0_dac_valid_q0 [get_bd_pins axi_ad9361_0/dac_valid_q0] [get_bd_pins radio_over_ethernet_0/tx_q0_valid]
-#  connect_bd_net -net axi_ad9361_0_dac_valid_q1 [get_bd_pins axi_ad9361_0/dac_valid_q1] [get_bd_pins radio_over_ethernet_0/tx_q1_valid]
-#  connect_bd_net -net radio_over_ethernet_0_tx_i0_data [get_bd_pins axi_ad9361_0/dac_data_i0] [get_bd_pins radio_over_ethernet_0/tx_i0_data]
-#  connect_bd_net -net radio_over_ethernet_0_tx_i1_data [get_bd_pins axi_ad9361_0/dac_data_i1] [get_bd_pins radio_over_ethernet_0/tx_i1_data]
-#  connect_bd_net -net radio_over_ethernet_0_tx_q0_data [get_bd_pins axi_ad9361_0/dac_data_q0] [get_bd_pins radio_over_ethernet_0/tx_q0_data]
-#  connect_bd_net -net radio_over_ethernet_0_tx_q1_data [get_bd_pins axi_ad9361_0/dac_data_q1] [get_bd_pins radio_over_ethernet_0/tx_q1_data]
-##}
-#
-#if {$::cpri_clk == "MMCM"} {
-#	# CPRI Clock Wizard
-#	create_bd_cell -type ip -vlnv xilinx.com:ip:clk_wiz:5.1 cpri_clk_wiz
-#
-#	# Configure for 7.68 MHz
-#	set_property -dict [list CONFIG.CLKOUT1_REQUESTED_OUT_FREQ {7.68} CONFIG.MMCM_DIVCLK_DIVIDE {5} CONFIG.MMCM_CLKFBOUT_MULT_F {42.000} CONFIG.MMCM_CLKOUT0_DIVIDE_F {109.375} CONFIG.CLKOUT1_JITTER {452.882} CONFIG.CLKOUT1_PHASE_ERROR {310.955}] [get_bd_cells cpri_clk_wiz]
-#
-#	# Configure the input port as coming from a clock used by other logic (add global buffer)
-#	set_property -dict [list CONFIG.PRIM_SOURCE {Global_buffer}] [get_bd_cells cpri_clk_wiz]
-#	# Add dynamic reconfiguration to the MMCM
-#	set_property -dict [list CONFIG.USE_DYN_RECONFIG {true}] [get_bd_cells cpri_clk_wiz]
-#	# Run block automation (connect S_AXI to microblaze)
-#	apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {Master "/microblaze_0 (Periph)" Clk "Auto" }  [get_bd_intf_pins cpri_clk_wiz/s_axi_lite]
-#	# Connect its aresetn
-#	connect_bd_net -net [get_bd_nets rst_mig_7series_0_100M_peripheral_aresetn] [get_bd_pins cpri_clk_wiz/s_axi_aresetn] [get_bd_pins rst_mig_7series_0_100M/peripheral_aresetn]
-#
-#	# Make the locked port external, in order to connect it to an LED
-#	create_bd_port -dir O locked
-#	connect_bd_net [get_bd_pins /cpri_clk_wiz/locked] [get_bd_ports locked]
-#	set_property name GPIO_LED_0 [get_bd_ports locked]
-#
-#} elseif { $::cpri_clk == "SI5324" } {
-#	# AXI IIC
-#	create_bd_cell -type ip -vlnv xilinx.com:ip:axi_iic:2.0 axi_iic_0
-#	apply_board_connection -board_interface "iic_main" -ip_intf "axi_iic_0/IIC" -diagram "block_design"
-#	# Connect to microblaze
-#	apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {Master "/microblaze_0 (Periph)" Clk "Auto" }  [get_bd_intf_pins axi_iic_0/S_AXI]
-#
-#	# Instantiate Si5324 IP for mapping external clocks
-#	create_bd_cell -type ip -vlnv LaPS:user:si5324:1.0 si5324_0
-#
-#	# Make its diff clocks (input and output) external
-#	create_bd_intf_port -mode Master -vlnv xilinx.com:interface:diff_clock_rtl:1.0 out_ckin
-#	connect_bd_intf_net [get_bd_intf_pins si5324_0/out_ckin] [get_bd_intf_ports out_ckin]
-#	create_bd_intf_port -mode Slave -vlnv xilinx.com:interface:diff_clock_rtl:1.0 in_ckout
-#	connect_bd_intf_net [get_bd_intf_pins si5324_0/in_ckout] [get_bd_intf_ports in_ckout]
-#
-#	# Set names
-#	set_property name si5324_ckin [get_bd_intf_ports out_ckin]
-#	set_property name si5324_ckout [get_bd_intf_ports in_ckout]
-#
-#	# Connect its reset ports
-#	connect_bd_net -net [get_bd_nets rst_mig_7series_0_100M_peripheral_aresetn] [get_bd_pins si5324_0/sys_aresetn] [get_bd_pins rst_mig_7series_0_100M/peripheral_aresetn]
-#	create_bd_port -dir O -type rst aresetn
-#	connect_bd_net [get_bd_pins /si5324_0/aresetn] [get_bd_ports aresetn]
-#
-#	# Set external reset pin name
-#	set_property name si5324_rst [get_bd_ports aresetn]
-#}
-#
-# Check if the RoE Clock should be output and connect to
-#if {$output_clock == 1} {
-#	set_property -dict [list CONFIG.output_clock {true}] [get_bd_cells radio_over_ethernet_0]
-#	create_bd_port -dir O cpri_clk_out
-#	connect_bd_net [get_bd_pins /radio_over_ethernet_0/cpri_clk_out] [get_bd_ports cpri_clk_out]
-#}
 
 ################################################################################
 #
@@ -414,54 +270,10 @@ apply_bd_automation -rule xilinx.com:bd_rule:axi_ethernet -config {PHY_TYPE "SGM
 # Note the order in which these interrupts are connected in the "Concat" block
 # corresponds to the priority order by default. In this case, the timer is connected
 # to In0 (LSB), thus receives highest priority.
-set iInterrupt 0
+connect_bd_net [get_bd_pins axi_ethernet_0_dma/mm2s_introut] [get_bd_pins microblaze_0_xlconcat/In0]
+connect_bd_net [get_bd_pins axi_ethernet_0_dma/s2mm_introut] [get_bd_pins microblaze_0_xlconcat/In1]
+connect_bd_net [get_bd_pins axi_ethernet_0/interrupt] [get_bd_pins microblaze_0_xlconcat/In2]
 
-# DMA Read Channel (highest priority)
-#if { $::data_source == "DMA" } {
-	connect_bd_net [get_bd_pins axi_dma_0/mm2s_introut] [get_bd_pins microblaze_0_xlconcat/In$iInterrupt]
-	incr iInterrupt 1
-#}
-
-# PTP Interrupts
-#if {$::sync_mode == "PTP"} {
-#	connect_bd_net [get_bd_pins axi_ethernet_0/interrupt_ptp_timer] [get_bd_pins microblaze_0_xlconcat/In$iInterrupt]
-#	incr iInterrupt 1
-#	connect_bd_net [get_bd_pins axi_ethernet_0/interrupt_ptp_rx] [get_bd_pins microblaze_0_xlconcat/In$iInterrupt]
-#	incr iInterrupt 1
-#	connect_bd_net [get_bd_pins axi_ethernet_0/interrupt_ptp_tx] [get_bd_pins microblaze_0_xlconcat/In$iInterrupt]
-#	incr iInterrupt 1
-#}
-#
-# DMA Write Channel
-#if { $::data_sink == "DMA" } {
-#	connect_bd_net [get_bd_pins axi_dma_0/s2mm_introut] [get_bd_pins microblaze_0_xlconcat/In$iInterrupt]
-#	incr iInterrupt 1
-#}
-
-# Timer and Uartlite
-connect_bd_net [get_bd_pins axi_timer_0/interrupt] [get_bd_pins microblaze_0_xlconcat/In$iInterrupt]
-incr iInterrupt 1
-connect_bd_net [get_bd_pins axi_uartlite_0/interrupt] [get_bd_pins microblaze_0_xlconcat/In$iInterrupt]
-incr iInterrupt 1
-
-# AXi Ethernet and Ethernet FIFO
-#if {!$::bypass_fronthaul} {
-#	connect_bd_net [get_bd_pins axi_ethernet_0/interrupt] [get_bd_pins microblaze_0_xlconcat/In$iInterrupt]
-#	incr iInterrupt 1
-#	connect_bd_net [get_bd_pins axi_ethernet_0_fifo/interrupt] [get_bd_pins microblaze_0_xlconcat/In$iInterrupt]
-#	incr iInterrupt 1
-#}
-
-# IIC
-#if { $::cpri_clk == "SI5324" } {
-#	connect_bd_net [get_bd_pins axi_iic_0/iic2intc_irpt] [get_bd_pins microblaze_0_xlconcat/In$iInterrupt]
-#	incr iInterrupt 1
-#}
-
-# Radio over Ethernet (lowest priority)
-##connect_bd_net [get_bd_pins radio_over_ethernet_0/interrupt] [get_bd_pins microblaze_0_xlconcat/In$iInterrupt]
-##incr iInterrupt 1
-#
 #################################################################################
 ## Other connections
 #################################################################################
@@ -549,7 +361,6 @@ incr iInterrupt 1
 #ad9361 out ports
 
 
-if {($::data_source == "ADC") || ($::data_sink == "DAC")} {
   # Rx and Tx may not be both used, by to avoid unconnected pins in the IP, connect
   # all of them.
 
@@ -642,4 +453,3 @@ if {($::data_source == "ADC") || ($::data_sink == "DAC")} {
   connect_bd_net -net fmcomms2_spi_sck_o [get_bd_pins ad9361_comm_0/sck_o] [get_bd_pins fmcomms2_spi/sck_o]
   connect_bd_net -net fmcomms2_spi_ss_o [get_bd_pins ad9361_comm_0/ss_o] [get_bd_pins fmcomms2_spi/ss_o]
   connect_bd_net -net [get_bd_nets microblaze_0_Clk] [get_bd_pins fmcomms2_spi/ext_spi_clk] [get_bd_pins mig_7series_0/ui_clk]
-}

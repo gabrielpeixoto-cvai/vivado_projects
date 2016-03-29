@@ -18,7 +18,7 @@ if { $::argc > 0 } {
 # Set the reference directory for source file relative paths
 # Set the reference directory to where the script is
 set origin_dir [file dirname [info script]]
-set root_dir "$origin_dir/../.."
+set root_dir "$origin_dir/.."
 
 ######################################################################
 # Default Parameters
@@ -54,7 +54,7 @@ set proj_name "sdr_testbed"
 	# define a different harware configuration.
 	# myconfig.tcl file is not being tracked, thus it is possible to configure
 	# harware as required without messing with tracked files.
-	source $origin_dir/myconfig.tcl
+#	source $origin_dir/myconfig.tcl
 #}
 
 ######################################################################
@@ -109,7 +109,7 @@ set_property used_in_synthesis false [get_files  $origin_dir/$proj_name/$proj_na
 # Synthesis
 #
 ######################################################################
-if 1 {
+if 0 {
     save_bd_design
     validate_bd_design
 
