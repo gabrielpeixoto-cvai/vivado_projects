@@ -15,31 +15,6 @@ set fixed_interrupts 3
 
 set no_interrupts $fixed_interrupts
 
-#if {!$::bypass_fronthaul} {
-#	# 2 extra interrupt ports when AXI Ethernet is present
-#	incr no_interrupts 2;
-#}
-
-#if {$::cpri_clk == "SI5324"} {
-#		# 1 extra interrupt ports for the IIC when SI5324 is used
-#	incr no_interrupts;
-#}
-#
-#if {$::sync_mode == "PTP"} {
-#	# 3 extra interrupt ports for the PTP Tx, Rx and Timer
-#	incr no_interrupts 3;
-#}
-#
-#if {$::data_source == "DMA"} {
-#	# mm2s_introut in the DMA read channel
-#	incr no_interrupts;
-#}
-#
-#if {$::data_sink == "DMA"} {
-#	# s2mm_introut in the DMA write channel
-#	incr no_interrupts;
-#}
-
 ######################################################################
 #
 # Instantiations and corresponding board connections
@@ -58,9 +33,9 @@ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_uartlite:2.0 axi_uartlite_0
 apply_board_connection -board_interface "rs232_uart" -ip_intf "axi_uartlite_0/UART" -diagram "block_design"
 
 # AXI Timer
-create_bd_cell -type ip -vlnv xilinx.com:ip:axi_timer:2.0 axi_timer_0
+#create_bd_cell -type ip -vlnv xilinx.com:ip:axi_timer:2.0 axi_timer_0
 
-#if {!$::bypass_fronthaul} {
+if {$::board == "VC707"} {
 	# AXI Ethernet
 	create_bd_cell -type ip -vlnv xilinx.com:ip:axi_ethernet:7.0 axi_ethernet_0
 	# Connect the MAC to the PHY via the Serial-gigabit media-independent Interface (SGMII):
@@ -69,7 +44,10 @@ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_timer:2.0 axi_timer_0
 	apply_board_connection -board_interface "mdio_mdc" -ip_intf "axi_ethernet_0/mdio" -diagram "block_design"
 	apply_board_connection -board_interface "phy_reset_out" -ip_intf "axi_ethernet_0/phy_rst_n" -diagram "block_design"
 	apply_board_connection -board_interface "sgmii_mgt_clk" -ip_intf "axi_ethernet_0/mgt_clk" -diagram "block_design"
-#}
+} elseif {$::board == "VC709"} {
+
+
+}
 
 ######################################################################
 #
@@ -116,53 +94,27 @@ set_property range 8K [get_bd_addr_segs {microblaze_0/Instruction/SEG_ilmb_bram_
 apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {Slave "/microblaze_0_axi_intc/s_axi" Clk "Auto" }  [get_bd_intf_pins microblaze_0/M_AXI_DC]
 apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {Slave "/microblaze_0_axi_intc/s_axi" Clk "Auto" }  [get_bd_intf_pins microblaze_0/M_AXI_IC]
 
-# Interrupt controller
-
-# When DMA is used as data source, in order to prevent preemption by interrupts
-# of lower priority, nested interrupts are enabled in the interrupt controller.
-#if {$::data_source == "DMA"} {
-#	set_property -dict [list CONFIG.C_HAS_ILR {1}] \
-#	[get_bd_cells microblaze_0_axi_intc]
-#}
-
 # Uartlite
 
 # Set baud rate:
 set_property -dict [list CONFIG.C_BAUDRATE {115200}] [get_bd_cells axi_uartlite_0]
 
-# AXI Ethernet
-# Connect AXI Streaming of AXI Ethernet to a FIFO (an instance of an AXI4-Stream FIFO core)
-#if {!$::bypass_fronthaul} {
-#	apply_bd_automation -rule xilinx.com:bd_rule:axi_ethernet -config {PHY_TYPE "SGMII" FIFO_DMA "FIFO" }  [get_bd_cells axi_ethernet_0]
-#
-## Note: the AXI4-Stream FIFO core converts AXI4/AXI4-Lite transactions to and from AXI4-Stream transactions
-## It has one AXI memory mapped interface that connects to the processor, and the 3 AXI Stream interfaces
-## required to interface with the AXI Ethernet core (TXC, TXD and RXD).
-## TXD - Transmit data, mm2s (memory mapped to stream)
-## TXC - Transmit control (used by AXI Ethernet for e.g. VLAN features), mm2s
-## RXD - Receive data, s2mm (stream to memory mapped)
-#
-#	if {$::sync_mode == "PTP"} {
-#		set_property -dict [list CONFIG.ENABLE_AVB {true}] [get_bd_cells axi_ethernet_0]
-#	}
-#}
-
 # Microblaze Concat (concatenates interrupts)
 #  Set number of interrupt ports
 set_property -dict [list CONFIG.NUM_PORTS $no_interrupts] [get_bd_cells microblaze_0_xlconcat]
 
+if {$::board == "VC707"} {
+	apply_bd_automation -rule xilinx.com:bd_rule:axi_ethernet -config {PHY_TYPE "SGMII" FIFO_DMA "DMA" }  [get_bd_cells axi_ethernet_0]
+} elseif {$::board == "VC709"} {
+
+
+}
 
 ######################################################################
 #
 # Connection automations
 #
 ######################################################################
-
-# Clock and rest board interfaces
-# Not necessary, keep here and remove after really checking that is not necessary
-#apply_bd_automation -rule xilinx.com:bd_rule:board -config {Board_Interface "sys_diff_clock" }  [get_bd_intf_pins clk_wiz_1/CLK_IN1_D]
-#apply_bd_automation -rule xilinx.com:bd_rule:board -config {Board_Interface "reset" }  [get_bd_pins clk_wiz_1/reset]
-#apply_bd_automation -rule xilinx.com:bd_rule:board -config {Board_Interface "reset" }  [get_bd_pins rst_clk_wiz_1_100M/ext_reset_in]
 
 # Memory Interface Generator
 # - Connects the board interface reset to the sys_rst in the MIG
@@ -180,48 +132,22 @@ apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {Master "/microblaze_0
 # Standard AXI memory-mapped automated connections
 # Namely add one more Master interface in the AXI interconnect and connect
 # system clock and reset signals
-apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {Master "/microblaze_0 (Periph)" Clk "Auto" }  [get_bd_intf_pins axi_timer_0/S_AXI]
+#apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {Master "/microblaze_0 (Periph)" Clk "Auto" }  [get_bd_intf_pins axi_timer_0/S_AXI]
 
-# AXI Ethernet
-# Connect the AXI Ethernet and the Ethernet AXI-Stream FIFO, both of which have AXI memory-mapped
-# interfaces for communication with the processor.
-# Notes:
-# - All the AXI Stream input clocks of the AXI Ethernet core must use the same clock (axis_clk
-#   @ 100 MHz) as the one used in AXI4-Stream FIFO core.
-# - AXI Ethernet has also an AXI4-Lite interface used by the processor to configure registers
-#
-# - AXI Ethernet has three clock sources:
-#     1) ref_clk -> stable clock (200MHz on 7 series)
-#                   Note a clocking wizard is automatically instantiated to generate a 200MHz
-#                   clock from a stable 100MHz clock.
-#
-#     2) mgt_clk -> external reference differential clock of 125MHz used to drive GTX/GTP serial
-#                   transceiver in all SGMII configurations.
-#
-#                   From VC707 manual:
-#                   "An Integrated Circuit Systems ICS844021I chip (U2) generates a high-quality,
-#                   low-jitter, 125 MHz LVDS clock from a 25 MHz crystal (X3). This clock is sent
-#                   to FPGA U1, Bank 113 GTX transceiver (clock pins AH8 (P) and AH7 (N)) driving
-#                   the SGMII interface".
-#
-#     3) axis_clk = s_axi_lite_clk -> AXI clock @ 100 Mhz (same as the processor clock).
-#
-#if {!$::bypass_fronthaul} {
-#	apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {Master "/microblaze_0 (Periph)" Clk "Auto" }  [get_bd_intf_pins axi_ethernet_0/s_axi]
-#	apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {Master "/microblaze_0 (Periph)" Clk "Auto" }  [get_bd_intf_pins axi_ethernet_0_fifo/S_AXI]
-#}
-apply_bd_automation -rule xilinx.com:bd_rule:axi_ethernet -config {PHY_TYPE "SGMII" FIFO_DMA "DMA" }  [get_bd_cells axi_ethernet_0]
+if {$::board == "VC707"} {
+	apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {Master "/microblaze_0 (Periph)" Clk "Auto" }  [get_bd_intf_pins axi_ethernet_0/s_axi]
+	apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {Master "/microblaze_0 (Periph)" Clk "Auto" }  [get_bd_intf_pins axi_ethernet_0_dma/S_AXI_LITE]
+	apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {Slave "/mig_7series_0/S_AXI" Clk "Auto" }  [get_bd_intf_pins axi_ethernet_0_dma/M_AXI_SG]
+	apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {Slave "/mig_7series_0/S_AXI" Clk "Auto" }  [get_bd_intf_pins axi_ethernet_0_dma/M_AXI_MM2S]
+
+	apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {Slave "/mig_7series_0/S_AXI" Clk "Auto" }  [get_bd_intf_pins axi_ethernet_0_dma/M_AXI_S2MM]
+} elseif {$::board == "VC709"} {
 
 
-apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {Master "/microblaze_0 (Periph)" Clk "Auto" }  [get_bd_intf_pins axi_ethernet_0/s_axi]
-apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {Master "/microblaze_0 (Periph)" Clk "Auto" }  [get_bd_intf_pins axi_ethernet_0_dma/S_AXI_LITE]
-apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {Slave "/mig_7series_0/S_AXI" Clk "Auto" }  [get_bd_intf_pins axi_ethernet_0_dma/M_AXI_SG]
-apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {Slave "/mig_7series_0/S_AXI" Clk "Auto" }  [get_bd_intf_pins axi_ethernet_0_dma/M_AXI_MM2S]
-
-apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {Slave "/mig_7series_0/S_AXI" Clk "Auto" }  [get_bd_intf_pins axi_ethernet_0_dma/M_AXI_S2MM]
+}
 
 # FMcomms2 IF Blocks
-#if {($::data_source == "ADC") || ($::data_sink == "DAC")} {
+
 	# Create instance: ad9361_comm_0, and set properties
 	set ad9361_comm_0 [ create_bd_cell -type ip -vlnv LaPS:user:ad9361_comm:1.0 ad9361_comm_0 ]
 
@@ -246,7 +172,7 @@ apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {Slave "/mig_7series_0
 
 	# Connect the SPI as AXI Slave
 	apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {Master "/microblaze_0 (Periph)" Clk "Auto" }  [get_bd_intf_pins fmcomms2_spi/AXI_LITE]
-#}
+
 
 
 ################################################################################
@@ -262,14 +188,7 @@ apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {Slave "/mig_7series_0
 
 # Concatenate Interrupt Signals (up to 32 can be concatenated)
 #  IPs with interrupts:
-#    - AXI Timer
-#    - AXI Uartlite
-#    - AXI Ethernet
-#    - AXI Ethernet FIFO
-#    - UFA13 Radio over Ethernet
-# Note the order in which these interrupts are connected in the "Concat" block
-# corresponds to the priority order by default. In this case, the timer is connected
-# to In0 (LSB), thus receives highest priority.
+
 connect_bd_net [get_bd_pins axi_ethernet_0_dma/mm2s_introut] [get_bd_pins microblaze_0_xlconcat/In0]
 connect_bd_net [get_bd_pins axi_ethernet_0_dma/s2mm_introut] [get_bd_pins microblaze_0_xlconcat/In1]
 connect_bd_net [get_bd_pins axi_ethernet_0/interrupt] [get_bd_pins microblaze_0_xlconcat/In2]
@@ -277,86 +196,88 @@ connect_bd_net [get_bd_pins axi_ethernet_0/interrupt] [get_bd_pins microblaze_0_
 #################################################################################
 ## Other connections
 #################################################################################
-#
-## UFA13 IP
-## First delete automated connections between TxC, TxD and RXD
-#if {!$::bypass_fronthaul} {
-#	delete_bd_objs [get_bd_intf_nets axi_ethernet_0_fifo_AXI_STR_TXC]
-#	delete_bd_objs [get_bd_intf_nets axi_ethernet_0_fifo_AXI_STR_TXD]
-#	delete_bd_objs [get_bd_intf_nets axi_ethernet_0_m_axis_rxd]
-#	# Then insert RoE IP between AXI FIFO and AXI Ethernet, connecting accordingly
-#	connect_bd_intf_net [get_bd_intf_pins radio_over_ethernet_0/m_axis_ethTxc]  [get_bd_intf_pins axi_ethernet_0/s_axis_txc]
-#	connect_bd_intf_net [get_bd_intf_pins radio_over_ethernet_0/m_axis_ethTxd]  [get_bd_intf_pins axi_ethernet_0/s_axis_txd]
-#	connect_bd_intf_net [get_bd_intf_pins radio_over_ethernet_0/s_axis_ethRxd]   [get_bd_intf_pins axi_ethernet_0/m_axis_rxd]
-#	connect_bd_intf_net [get_bd_intf_pins radio_over_ethernet_0/s_axis_fifoTxc] [get_bd_intf_pins axi_ethernet_0_fifo/AXI_STR_TXC]
-#	connect_bd_intf_net [get_bd_intf_pins radio_over_ethernet_0/s_axis_fifoTxd] [get_bd_intf_pins axi_ethernet_0_fifo/AXI_STR_TXD]
-#	connect_bd_intf_net [get_bd_intf_pins radio_over_ethernet_0/m_axis_fifoRx]  [get_bd_intf_pins axi_ethernet_0_fifo/AXI_STR_RXD]
-#}
-#
-#if {$::cpri_clk == "MMCM"} {
-#	# Connect CPRI clock from the clock wizard to the RoE IP
-#	connect_bd_net [get_bd_pins radio_over_ethernet_0/cpri_clk] [get_bd_pins cpri_clk_wiz/clk_out1]
-#	# And pass the system clock to the clock wizard as reference
-#	connect_bd_net -net [get_bd_nets microblaze_0_Clk] [get_bd_pins cpri_clk_wiz/clk_in1] [get_bd_pins mig_7series_0/ui_clk]
-#} elseif { $::cpri_clk == "SI5324" } {
-#
-#	#
-#	# Connect Si5324 to RoE
-#	#
-#	# Two alternatives:
-#	#
-#	# Alternative #1: Direct Connection
-#	#       Si5324 ----------------------------------------> RoE
-#	# Alternative #2: When AD9361 is used
-#	#   Si5324 ---->     AD9361     ---->    RoE
-#	#                 (out of FPGA)       (back inside the FPGA)
-#	#
-#	if {($::data_source == "ADC") || ($::data_sink == "DAC")} {
-#		# When the AD9361 is used, the Si5324 is configured to output 40 MHz,
-#		# instead of the CPRI clock directly. This is because 40 MHz is the
-#		# frequency that is fed to the fmcomms2 as external clock. The AD9361
-#		# returns a clock whose frequency is 4 times the sampling frequency back in
-#		# its "locked clock" (l_clk) pin. This is the clock that is connected the
-#		# RoE core "cpri_clk" input:
-#		connect_bd_net -net [get_bd_nets axi_ad9361_0_l_clk] \
-#		                    [get_bd_pins radio_over_ethernet_0/cpri_clk] \
-#		                    [get_bd_pins axi_ad9361_0/l_clk]
-#	} else {
-#		# Connect the Si5324 output clock directly to the RoE CPRI clock
-#		connect_bd_net [get_bd_pins si5324_0/out_clk] \
-#		               [get_bd_pins radio_over_ethernet_0/cpri_clk]
-#	}
-#	# In any case, connect the Si5324 output for external use to an external port
-#	create_bd_port -dir O si5324_out_clk_ext
-#	connect_bd_net [get_bd_pins /si5324_0/out_clk_ext] \
-#	               [get_bd_ports si5324_out_clk_ext]
-#	#
-#	# Determine the reference passed to Si5324
-#	#
-#	if {$::sync_mode == "PTP"} {
-#		# Pass the synchronized clk8k as reference to the Si5324
-#		connect_bd_net [get_bd_pins axi_ethernet_0/clk8k] \
-#		               [get_bd_pins si5324_0/ref_clk]
-#
-#		if {$output_clock == 1} {
-#			# And also make the clk8k available for external observation
-#			create_bd_port -dir O clk8k
-#			connect_bd_net [get_bd_pins /axi_ethernet_0/clk8k] [get_bd_ports clk8k]
-#		}
-#	} else {
-#		# When PTP is not used, the reference can't be clk8k from AVB
-#		if {$::bypass_fronthaul == 0} {
-#			# Pass the Ethernet GTX clk as reference to the Si5324
-#			connect_bd_net [get_bd_pins axi_ethernet_0/userclk2_out] [get_bd_pins si5324_0/ref_clk]
-#		} else {
-#			# If the Fronthaul is bypassed, AXI Ethernet is not present in the design.
-#			# Then, pass the 200 MHz clock from the MIG as reference to Si5324.
-#			connect_bd_net [get_bd_pins mig_7series_0/ui_addn_clk_0] [get_bd_pins si5324_0/ref_clk]
-#		}
-#	}
-#}
-#
-##AD9361 IF
+
+################################AD9361##########################################
+
+
+if {$::ad9361_mode == "NO_DATA"} {
+
+	create_bd_port -dir O adc_enable_i0
+	connect_bd_net [get_bd_pins /axi_ad9361_0/adc_enable_i0] [get_bd_ports adc_enable_i0]
+
+	create_bd_port -dir O adc_valid_i0
+	connect_bd_net [get_bd_pins /axi_ad9361_0/adc_valid_i0] [get_bd_ports adc_valid_i0]
+
+	create_bd_port -dir O -from 15 -to 0 adc_data_i0
+	connect_bd_net [get_bd_pins /axi_ad9361_0/adc_data_i0] [get_bd_ports adc_data_i0]
+
+	create_bd_port -dir O adc_enable_q0
+	connect_bd_net [get_bd_pins /axi_ad9361_0/adc_enable_q0] [get_bd_ports adc_enable_q0]
+
+	create_bd_port -dir O adc_valid_q0
+	connect_bd_net [get_bd_pins /axi_ad9361_0/adc_valid_q0] [get_bd_ports adc_valid_q0]
+
+	create_bd_port -dir O -from 15 -to 0 adc_data_q0
+	connect_bd_net [get_bd_pins /axi_ad9361_0/adc_data_q0] [get_bd_ports adc_data_q0]
+
+	create_bd_port -dir O adc_enable_i1
+	connect_bd_net [get_bd_pins /axi_ad9361_0/adc_enable_i1] [get_bd_ports adc_enable_i1]
+
+	create_bd_port -dir O adc_valid_i1
+	connect_bd_net [get_bd_pins /axi_ad9361_0/adc_valid_i1] [get_bd_ports adc_valid_i1]
+
+	create_bd_port -dir O -from 15 -to 0 adc_data_i1
+	connect_bd_net [get_bd_pins /axi_ad9361_0/adc_data_i1] [get_bd_ports adc_data_i1]
+
+	create_bd_port -dir O adc_enable_q1
+	connect_bd_net [get_bd_pins /axi_ad9361_0/adc_enable_q1] [get_bd_ports adc_enable_q1]
+
+	create_bd_port -dir O adc_valid_q1
+	connect_bd_net [get_bd_pins /axi_ad9361_0/adc_valid_q1] [get_bd_ports adc_valid_q1]
+
+	create_bd_port -dir O -from 15 -to 0 adc_data_q1
+	connect_bd_net [get_bd_pins /axi_ad9361_0/adc_data_q1] [get_bd_ports adc_data_q1]
+
+	create_bd_port -dir O dac_enable_i0
+	connect_bd_net [get_bd_pins /axi_ad9361_0/dac_enable_i0] [get_bd_ports dac_enable_i0]
+
+	create_bd_port -dir O dac_valid_i0
+	connect_bd_net [get_bd_pins /axi_ad9361_0/dac_valid_i0] [get_bd_ports dac_valid_i0]
+
+	create_bd_port -dir O dac_enable_q0
+	connect_bd_net [get_bd_pins /axi_ad9361_0/dac_enable_q0] [get_bd_ports dac_enable_q0]
+
+	create_bd_port -dir O dac_valid_q0
+	connect_bd_net [get_bd_pins /axi_ad9361_0/dac_valid_q0] [get_bd_ports dac_valid_q0]
+
+	create_bd_port -dir O dac_enable_i1
+	connect_bd_net [get_bd_pins /axi_ad9361_0/dac_enable_i1] [get_bd_ports dac_enable_i1]
+
+	create_bd_port -dir O dac_valid_i1
+	connect_bd_net [get_bd_pins /axi_ad9361_0/dac_valid_i1] [get_bd_ports dac_valid_i1]
+
+	create_bd_port -dir O dac_enable_q1
+	connect_bd_net [get_bd_pins /axi_ad9361_0/dac_enable_q1] [get_bd_ports dac_enable_q1]
+
+	create_bd_port -dir O dac_valid_q1
+	connect_bd_net [get_bd_pins /axi_ad9361_0/dac_valid_q1] [get_bd_ports dac_valid_q1]
+
+	create_bd_port -dir I -from 15 -to 0 dac_data_i0
+	connect_bd_net [get_bd_pins /axi_ad9361_0/dac_data_i0] [get_bd_ports dac_data_i0]
+
+	create_bd_port -dir I -from 15 -to 0 dac_data_q0
+	connect_bd_net [get_bd_pins /axi_ad9361_0/dac_data_q0] [get_bd_ports dac_data_q0]
+
+	create_bd_port -dir I -from 15 -to 0 dac_data_i1
+	connect_bd_net [get_bd_pins /axi_ad9361_0/dac_data_i1] [get_bd_ports dac_data_i1]
+
+	create_bd_port -dir I -from 15 -to 0 dac_data_q1
+	connect_bd_net [get_bd_pins /axi_ad9361_0/dac_data_q1] [get_bd_ports dac_data_q1]
+
+} elseif {$::ad9361_mode == "DATA_IF"} {
+	#TODO
+}
+
 
 #ad9361 out ports
 

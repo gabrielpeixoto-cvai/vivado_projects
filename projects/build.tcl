@@ -25,47 +25,13 @@ set root_dir "$origin_dir/.."
 #
 ######################################################################
 
-# Data Source Modes: "ADC", "DMA", "Emulation"
-#set ::data_source "DMA"
-# Data Sink Modes: "DAC", "DMA", "Trash"
-#set ::data_sink "Trash"
-# CPRI Clock Sources: "MMCM" "SI5324"
-#set ::cpri_clk "SI5324"
-# Synchronization mode: "Buffer", "PTP"
-#set ::sync_mode "PTP"
-# Define if Fronthaul should be bypassed
-#set ::bypass_fronthaul 1
-# Enable/Disable RoE Output Clock for external analysis
-#set ::output_clock 1
-# Define the CPRI clock frequency (4 * sampling frequency)
-#set ::cpri_clk_freq 30720000
+# ad9361_mode: "DATA_IF", "NO_DATA"
+set ::ad9361_mode "NO_DATA"
+# board: "VC707", "VC709"
+set ::board "VC707"
+
 # Vivado Project Name
 set proj_name "sdr_testbed"
-
-######################################################################
-# Override Parameters (above) using a target configuration file or
-# the default "myconfig.tcl"
-#
-######################################################################
-#if { [info exists target_config] && $target_config ne "" } {
-#    source $origin_dir/$target_config
-#} elseif { [file exist "$origin_dir/myconfig.tcl"] == 1 } {
-	# Copy and paste the block of code above into myconfig.tcl file in order to
-	# define a different harware configuration.
-	# myconfig.tcl file is not being tracked, thus it is possible to configure
-	# harware as required without messing with tracked files.
-#	source $origin_dir/myconfig.tcl
-#}
-
-######################################################################
-# Process parameters
-#
-######################################################################
-
-#if {$::bypass_fronthaul} {
-	# If Fronthaul is bypassed, then there can't be synchronization
-#	set ::sync_mode "none"
-#}
 
 ######################################################################
 # Create Vivado Project and Block Design
@@ -73,10 +39,15 @@ set proj_name "sdr_testbed"
 ######################################################################
 
 # Create Project, set board and VHDL
+if {$::board == "VC707"} {
 
-# The following assumes the script is being runned from the vivado folder
 create_project $proj_name $origin_dir/$proj_name -part xc7vx485tffg1761-2
 set_property board_part xilinx.com:vc707:part0:1.2 [current_project]
+
+} elseif {$::board == "VC709"} {
+
+}
+
 set_property target_language VHDL [current_project]
 create_bd_design "block_design"
 
@@ -109,7 +80,7 @@ set_property used_in_synthesis false [get_files  $origin_dir/$proj_name/$proj_na
 # Synthesis
 #
 ######################################################################
-if 0 {
+if 1 {
     save_bd_design
     validate_bd_design
 
