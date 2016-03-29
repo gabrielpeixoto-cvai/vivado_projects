@@ -26,46 +26,46 @@ set root_dir "$origin_dir/../.."
 ######################################################################
 
 # Data Source Modes: "ADC", "DMA", "Emulation"
-set ::data_source "DMA"
+#set ::data_source "DMA"
 # Data Sink Modes: "DAC", "DMA", "Trash"
-set ::data_sink "Trash"
+#set ::data_sink "Trash"
 # CPRI Clock Sources: "MMCM" "SI5324"
-set ::cpri_clk "SI5324"
+#set ::cpri_clk "SI5324"
 # Synchronization mode: "Buffer", "PTP"
-set ::sync_mode "PTP"
+#set ::sync_mode "PTP"
 # Define if Fronthaul should be bypassed
-set ::bypass_fronthaul 1
+#set ::bypass_fronthaul 1
 # Enable/Disable RoE Output Clock for external analysis
-set ::output_clock 1
+#set ::output_clock 1
 # Define the CPRI clock frequency (4 * sampling frequency)
-set ::cpri_clk_freq 30720000
+#set ::cpri_clk_freq 30720000
 # Vivado Project Name
-set proj_name "roe_testbed"
+set proj_name "sdr_testbed"
 
 ######################################################################
 # Override Parameters (above) using a target configuration file or
 # the default "myconfig.tcl"
 #
 ######################################################################
-if { [info exists target_config] && $target_config ne "" } {
-    source $origin_dir/$target_config
-} elseif { [file exist "$origin_dir/myconfig.tcl"] == 1 } {
+#if { [info exists target_config] && $target_config ne "" } {
+#    source $origin_dir/$target_config
+#} elseif { [file exist "$origin_dir/myconfig.tcl"] == 1 } {
 	# Copy and paste the block of code above into myconfig.tcl file in order to
 	# define a different harware configuration.
 	# myconfig.tcl file is not being tracked, thus it is possible to configure
 	# harware as required without messing with tracked files.
 	source $origin_dir/myconfig.tcl
-}
+#}
 
 ######################################################################
 # Process parameters
 #
 ######################################################################
 
-if {$::bypass_fronthaul} {
+#if {$::bypass_fronthaul} {
 	# If Fronthaul is bypassed, then there can't be synchronization
-	set ::sync_mode "none"
-}
+#	set ::sync_mode "none"
+#}
 
 ######################################################################
 # Create Vivado Project and Block Design
@@ -81,7 +81,7 @@ set_property target_language VHDL [current_project]
 create_bd_design "block_design"
 
 # Add IP repo
-puts "Add UFA13 IP repositories"
+puts "Add IP repositories"
 set_property  ip_repo_paths  "$root_dir/analog_devices/library $root_dir/ips $root_dir/interfaces" [current_project]
 update_ip_catalog
 
