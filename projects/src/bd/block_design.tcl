@@ -197,85 +197,85 @@ connect_bd_net [get_bd_pins axi_ethernet_0/interrupt] [get_bd_pins microblaze_0_
 ## Other connections
 #################################################################################
 
-################################AD9361##########################################
+#################################AD9361##########################################
 
 
 if {$::ad9361_mode == "NO_DATA"} {
 
-	create_bd_port -dir O adc_enable_i0
-	connect_bd_net [get_bd_pins /axi_ad9361_0/adc_enable_i0] [get_bd_ports adc_enable_i0]
+	#create_bd_port -dir O adc_enable_i0
+	#connect_bd_net [get_bd_pins /axi_ad9361_0/adc_enable_i0] [get_bd_ports adc_enable_i0]
 
-	create_bd_port -dir O adc_valid_i0
-	connect_bd_net [get_bd_pins /axi_ad9361_0/adc_valid_i0] [get_bd_ports adc_valid_i0]
+	#create_bd_port -dir O adc_valid_i0
+	#connect_bd_net [get_bd_pins /axi_ad9361_0/adc_valid_i0] [get_bd_ports adc_valid_i0]
 
-	create_bd_port -dir O -from 15 -to 0 adc_data_i0
-	connect_bd_net [get_bd_pins /axi_ad9361_0/adc_data_i0] [get_bd_ports adc_data_i0]
+	#create_bd_port -dir O -from 15 -to 0 adc_data_i0
+	#connect_bd_net [get_bd_pins /axi_ad9361_0/adc_data_i0] [get_bd_ports adc_data_i0]
 
-	create_bd_port -dir O adc_enable_q0
-	connect_bd_net [get_bd_pins /axi_ad9361_0/adc_enable_q0] [get_bd_ports adc_enable_q0]
+	#create_bd_port -dir O adc_enable_q0
+	#connect_bd_net [get_bd_pins /axi_ad9361_0/adc_enable_q0] [get_bd_ports adc_enable_q0]
 
-	create_bd_port -dir O adc_valid_q0
-	connect_bd_net [get_bd_pins /axi_ad9361_0/adc_valid_q0] [get_bd_ports adc_valid_q0]
+	#create_bd_port -dir O adc_valid_q0
+	#connect_bd_net [get_bd_pins /axi_ad9361_0/adc_valid_q0] [get_bd_ports adc_valid_q0]
 
-	create_bd_port -dir O -from 15 -to 0 adc_data_q0
-	connect_bd_net [get_bd_pins /axi_ad9361_0/adc_data_q0] [get_bd_ports adc_data_q0]
+	#create_bd_port -dir O -from 15 -to 0 adc_data_q0
+	#connect_bd_net [get_bd_pins /axi_ad9361_0/adc_data_q0] [get_bd_ports adc_data_q0]
 
-	create_bd_port -dir O adc_enable_i1
-	connect_bd_net [get_bd_pins /axi_ad9361_0/adc_enable_i1] [get_bd_ports adc_enable_i1]
+	#create_bd_port -dir O adc_enable_i1
+	#connect_bd_net [get_bd_pins /axi_ad9361_0/adc_enable_i1] [get_bd_ports adc_enable_i1]
 
-	create_bd_port -dir O adc_valid_i1
-	connect_bd_net [get_bd_pins /axi_ad9361_0/adc_valid_i1] [get_bd_ports adc_valid_i1]
+	#create_bd_port -dir O adc_valid_i1
+	#connect_bd_net [get_bd_pins /axi_ad9361_0/adc_valid_i1] [get_bd_ports adc_valid_i1]
 
-	create_bd_port -dir O -from 15 -to 0 adc_data_i1
-	connect_bd_net [get_bd_pins /axi_ad9361_0/adc_data_i1] [get_bd_ports adc_data_i1]
+	#create_bd_port -dir O -from 15 -to 0 adc_data_i1
+	#connect_bd_net [get_bd_pins /axi_ad9361_0/adc_data_i1] [get_bd_ports adc_data_i1]
 
-	create_bd_port -dir O adc_enable_q1
-	connect_bd_net [get_bd_pins /axi_ad9361_0/adc_enable_q1] [get_bd_ports adc_enable_q1]
+	#create_bd_port -dir O adc_enable_q1
+	#connect_bd_net [get_bd_pins /axi_ad9361_0/adc_enable_q1] [get_bd_ports adc_enable_q1]
 
-	create_bd_port -dir O adc_valid_q1
-	connect_bd_net [get_bd_pins /axi_ad9361_0/adc_valid_q1] [get_bd_ports adc_valid_q1]
+	#create_bd_port -dir O adc_valid_q1
+	#connect_bd_net [get_bd_pins /axi_ad9361_0/adc_valid_q1] [get_bd_ports adc_valid_q1]
 
-	create_bd_port -dir O -from 15 -to 0 adc_data_q1
-	connect_bd_net [get_bd_pins /axi_ad9361_0/adc_data_q1] [get_bd_ports adc_data_q1]
+	#create_bd_port -dir O -from 15 -to 0 adc_data_q1
+	#connect_bd_net [get_bd_pins /axi_ad9361_0/adc_data_q1] [get_bd_ports adc_data_q1]
 
-	create_bd_port -dir O dac_enable_i0
-	connect_bd_net [get_bd_pins /axi_ad9361_0/dac_enable_i0] [get_bd_ports dac_enable_i0]
+	#create_bd_port -dir O dac_enable_i0
+	#connect_bd_net [get_bd_pins /axi_ad9361_0/dac_enable_i0] [get_bd_ports dac_enable_i0]
 
-	create_bd_port -dir O dac_valid_i0
-	connect_bd_net [get_bd_pins /axi_ad9361_0/dac_valid_i0] [get_bd_ports dac_valid_i0]
+	#create_bd_port -dir O dac_valid_i0
+	#connect_bd_net [get_bd_pins /axi_ad9361_0/dac_valid_i0] [get_bd_ports dac_valid_i0]
 
-	create_bd_port -dir O dac_enable_q0
-	connect_bd_net [get_bd_pins /axi_ad9361_0/dac_enable_q0] [get_bd_ports dac_enable_q0]
+	#create_bd_port -dir O dac_enable_q0
+	#connect_bd_net [get_bd_pins /axi_ad9361_0/dac_enable_q0] [get_bd_ports dac_enable_q0]
 
-	create_bd_port -dir O dac_valid_q0
-	connect_bd_net [get_bd_pins /axi_ad9361_0/dac_valid_q0] [get_bd_ports dac_valid_q0]
+	#create_bd_port -dir O dac_valid_q0
+	#connect_bd_net [get_bd_pins /axi_ad9361_0/dac_valid_q0] [get_bd_ports dac_valid_q0]
 
-	create_bd_port -dir O dac_enable_i1
-	connect_bd_net [get_bd_pins /axi_ad9361_0/dac_enable_i1] [get_bd_ports dac_enable_i1]
+	#create_bd_port -dir O dac_enable_i1
+	#connect_bd_net [get_bd_pins /axi_ad9361_0/dac_enable_i1] [get_bd_ports dac_enable_i1]
 
-	create_bd_port -dir O dac_valid_i1
-	connect_bd_net [get_bd_pins /axi_ad9361_0/dac_valid_i1] [get_bd_ports dac_valid_i1]
+	#create_bd_port -dir O dac_valid_i1
+	#connect_bd_net [get_bd_pins /axi_ad9361_0/dac_valid_i1] [get_bd_ports dac_valid_i1]
 
-	create_bd_port -dir O dac_enable_q1
-	connect_bd_net [get_bd_pins /axi_ad9361_0/dac_enable_q1] [get_bd_ports dac_enable_q1]
+	#create_bd_port -dir O dac_enable_q1
+	#connect_bd_net [get_bd_pins /axi_ad9361_0/dac_enable_q1] [get_bd_ports dac_enable_q1]
 
-	create_bd_port -dir O dac_valid_q1
-	connect_bd_net [get_bd_pins /axi_ad9361_0/dac_valid_q1] [get_bd_ports dac_valid_q1]
+	#create_bd_port -dir O dac_valid_q1
+	#connect_bd_net [get_bd_pins /axi_ad9361_0/dac_valid_q1] [get_bd_ports dac_valid_q1]
 
-	create_bd_port -dir I -from 15 -to 0 dac_data_i0
-	connect_bd_net [get_bd_pins /axi_ad9361_0/dac_data_i0] [get_bd_ports dac_data_i0]
+	#create_bd_port -dir I -from 15 -to 0 dac_data_i0
+	#connect_bd_net [get_bd_pins /axi_ad9361_0/dac_data_i0] [get_bd_ports dac_data_i0]
 
-	create_bd_port -dir I -from 15 -to 0 dac_data_q0
-	connect_bd_net [get_bd_pins /axi_ad9361_0/dac_data_q0] [get_bd_ports dac_data_q0]
+	#create_bd_port -dir I -from 15 -to 0 dac_data_q0
+	#connect_bd_net [get_bd_pins /axi_ad9361_0/dac_data_q0] [get_bd_ports dac_data_q0]
 
-	create_bd_port -dir I -from 15 -to 0 dac_data_i1
-	connect_bd_net [get_bd_pins /axi_ad9361_0/dac_data_i1] [get_bd_ports dac_data_i1]
+	#create_bd_port -dir I -from 15 -to 0 dac_data_i1
+	#connect_bd_net [get_bd_pins /axi_ad9361_0/dac_data_i1] [get_bd_ports dac_data_i1]
 
-	create_bd_port -dir I -from 15 -to 0 dac_data_q1
-	connect_bd_net [get_bd_pins /axi_ad9361_0/dac_data_q1] [get_bd_ports dac_data_q1]
+	#create_bd_port -dir I -from 15 -to 0 dac_data_q1
+	#connect_bd_net [get_bd_pins /axi_ad9361_0/dac_data_q1] [get_bd_ports dac_data_q1]
 
 } elseif {$::ad9361_mode == "DATA_IF"} {
-	#TODO
+	##TODO
 }
 
 
