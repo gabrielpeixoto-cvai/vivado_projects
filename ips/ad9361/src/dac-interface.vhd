@@ -39,7 +39,7 @@ entity dacInterface is
 		dacClk : in std_logic;
 		ethClk : in std_logic;
 		rst : in std_logic;
-		-- AXIS Input
+		-- AXIS Input Commuter
 		-- AxC 0
 		s_axis_axc0_i_tready : out std_logic;
 		s_axis_axc0_i_tvalid : in std_logic;
@@ -77,17 +77,17 @@ end dacInterface;
 
 architecture Behavioral of dacInterface is
 
-	component occupancy_ctrl is
-	port (
-	    rst : in std_logic;
-	    clk : in std_logic;
-	    occupancy_in 	: in std_logic_vector (12 downto 0);
-	    interrupt 		: out std_logic;
-	    interruptInfo 	: out std_logic_vector (31 downto 0);
-	    iq_fifo_rd_en 	: out std_logic;
-	    full_panic 	 	: out std_logic
-	  );
-	end component;
+	--component occupancy_ctrl is
+	--port (
+	--    rst : in std_logic;
+	--    clk : in std_logic;
+	--    occupancy_in 	: in std_logic_vector (12 downto 0);
+	--    interrupt 		: out std_logic;
+	--    interruptInfo 	: out std_logic_vector (31 downto 0);
+	--    iq_fifo_rd_en 	: out std_logic;
+	--    full_panic 	 	: out std_logic
+	--  );
+	--end component;
 
 	COMPONENT native_fifo_8192x16
 	PORT (
@@ -228,10 +228,10 @@ begin
 	-------------------------------------------------------------------------
 
 	-- Write enable signal for the IQ FIFOs above
-	axc0_i_fifo_wr_en <= s_axis_axc0_i_tvalid and (not full_panic_flag);
-	axc0_q_fifo_wr_en <= s_axis_axc0_q_tvalid and (not full_panic_flag);
-	axc1_i_fifo_wr_en <= s_axis_axc1_i_tvalid and (not full_panic_flag);
-	axc1_q_fifo_wr_en <= s_axis_axc1_q_tvalid and (not full_panic_flag);
+	axc0_i_fifo_wr_en <= s_axis_axc0_i_tvalid --and (not full_panic_flag);
+	axc0_q_fifo_wr_en <= s_axis_axc0_q_tvalid --and (not full_panic_flag);
+	axc1_i_fifo_wr_en <= s_axis_axc1_i_tvalid --and (not full_panic_flag);
+	axc1_q_fifo_wr_en <= s_axis_axc1_q_tvalid --and (not full_panic_flag);
 
 	-- Read enable signal for the IQ FIFOs above.
 	i0_rd_en <= iq_fifo_rd_enable and tx_i0_valid and tx_i0_enable;
@@ -245,15 +245,15 @@ begin
 	s_axis_axc1_i_tready <= not i1_full;
 	s_axis_axc1_q_tready <= not q1_full;
 
-	occCtrl : occupancy_ctrl
-	port map (
-		rst => rst,
-		clk => ethClk,
-		occupancy_in => i0_fifo_occ,
-		interrupt => clkCtrlInterrupt,
-		interruptInfo => clkCtrlInterruptInfo,
-		iq_fifo_rd_en => iq_fifo_rd_enable,
-		full_panic => full_panic_flag
-	);
+	--occCtrl : occupancy_ctrl
+	--port map (
+	--	rst => rst,
+	--	clk => ethClk,
+	--	occupancy_in => i0_fifo_occ,
+	--	interrupt => clkCtrlInterrupt,
+	--	interruptInfo => clkCtrlInterruptInfo,
+	--	iq_fifo_rd_en => iq_fifo_rd_enable,
+	--	full_panic => full_panic_flag
+	--);
 
 end Behavioral;
