@@ -24,16 +24,16 @@ entity ad9361_data is
 		-- AD9361 dac
 		dac_i0_valid  : in std_logic;
 		dac_i0_enable : in std_logic;
-		dac_i0_data   : in std_logic_vector(15 downto 0);
+		dac_i0_data   : out std_logic_vector(15 downto 0);
 		dac_q0_valid  : in std_logic;
 		dac_q0_enable : in std_logic;
-		dac_q0_data   : in std_logic_vector(15 downto 0);
+		dac_q0_data   : out std_logic_vector(15 downto 0);
 		dac_i1_valid  : in std_logic;
 		dac_i1_enable : in std_logic;
-		dac_i1_data   : in std_logic_vector(15 downto 0);
+		dac_i1_data   : out std_logic_vector(15 downto 0);
 		dac_q1_valid  : in std_logic;
 		dac_q1_enable : in std_logic;
-		dac_q1_data   : in std_logic_vector(15 downto 0);
+		dac_q1_data   : out std_logic_vector(15 downto 0);
 
 		-- AD9361 adc
 		dac_i0_valid  : in std_logic;
@@ -52,11 +52,11 @@ entity ad9361_data is
 		-- DMA interface
 		dac_dma_iq_tready : in std_logic;
 		dac_dma_iq_tvalid : out std_logic;
-		dac_dma_iq_tdata  : in std_logic_vector(64 downto 0)
+		dac_dma_iq_tdata  : in std_logic_vector(31 downto 0);
 
 		adc_dma_iq_tready : in std_logic;
 		adc_dma_iq_tvalid : out std_logic;
-		adc_dma_iq_tdata  : out std_logic_vector(64 downto 0)
+		adc_dma_iq_tdata  : out std_logic_vector(31 downto 0)
 
 
 	);
@@ -132,5 +132,211 @@ architecture Behavioral of adcInterface is
 			m_axis_iq_tdata  : out std_logic_vector(31 downto 0)
 		);
 	end component;
+
+	component dac_dmaInterface is
+		port(
+			-- Defaults
+			clk_fs : in std_logic;
+			clk_axi : in std_logic;
+			rst : in std_logic;
+			-- DMA AXIS Input
+			s_axis_dma_tvalid : in std_logic;
+			s_axis_dma_tready : out  std_logic;
+			s_axis_dma_tdata  : in std_logic_vector(31 downto 0);
+			-- Output of IQ samples through AXIS bus
+			m_axis_i0_tready : in std_logic;
+			m_axis_i0_tvalid : out std_logic;
+			m_axis_i0_tdata  : out std_logic_vector(31 downto 0);
+
+			m_axis_q0_tready : in std_logic;
+			m_axis_q0_tvalid : out std_logic;
+			m_axis_q0_tdata  : out std_logic_vector(31 downto 0)
+
+			m_axis_i1_tready : in std_logic;
+			m_axis_i1_tvalid : out std_logic;
+			m_axis_i1_tdata  : out std_logic_vector(31 downto 0)
+
+			m_axis_iq1_tready : in std_logic;
+			m_axis_iq1_tvalid : out std_logic;
+			m_axis_iq1_tdata  : out std_logic_vector(31 downto 0)
+		);
+
+	end component;
+
+	component adc_dmaInterface is
+		generic(
+			n_axc : integer := 2;
+			--compression_ratio  : integer := 1;
+			dma_read_data_type : string  := "raw"
+		);
+		port(
+			-- Defaults
+			clk_fs : in std_logic;
+			clk_axi : in std_logic;
+			rst : in std_logic;
+			-- DMA AXIS Input
+			s_axis_dma_tvalid : in std_logic;
+			s_axis_dma_tready : out  std_logic;
+			s_axis_dma_tdata  : in std_logic_vector(31 downto 0);
+
+			-- Input of IQ samples through AXIS bus
+			m_axis_iq_tready : in std_logic;
+			m_axis_iq_tvalid : out std_logic;
+			m_axis_iq_tdata  : out std_logic_vector(31 downto 0)
+		);
+	end component;
+
+	--signals
+	--dac signals
+	signal tx_i0_valid  : std_logic;
+	signal tx_i0_enable : std_logic;
+	signal tx_i0_data   : std_logic_vector(15 downto 0);
+	signal tx_q0_valid  : std_logic;
+	signal tx_q0_enable : std_logic;
+	signal tx_q0_data   : std_logic_vector(15 downto 0);
+	signal tx_i1_valid  : std_logic;
+	signal tx_i1_enable : std_logic;
+	signal tx_i1_data   : std_logic_vector(15 downto 0);
+	signal tx_q1_valid  : std_logic;
+	signal tx_q1_enable : std_logic;
+	signal tx_q1_data   : std_logic_vector(15 downto 0);
+
+	--adc signals
+	signal rx_i0_valid  : std_logic;
+	signal rx_i0_enable : std_logic;
+	signal rx_i0_data   : std_logic_vector(15 downto 0);
+	signal rx_q0_valid  : std_logic;
+	signal rx_q0_enable : std_logic;
+	signal rx_q0_data   : std_logic_vector(15 downto 0);
+	signal rx_i1_valid  : std_logic;
+	signal rx_i1_enable : std_logic;
+	signal rx_i1_data   : std_logic_vector(15 downto 0);
+	signal rx_q1_valid  : std_logic;
+	signal rx_q1_enable : std_logic;
+	signal rx_q1_data   : std_logic_vector(15 downto 0);
+
+	--dma signals
+	-- DMA interface
+	signal dac_dma_iq_tready : std_logic;
+	signal dac_dma_iq_tvalid : std_logic;
+	signal dac_dma_iq_tdata  : std_logic_vector(31 downto 0);
+
+	signal adc_dma_iq_tready : std_logic;
+	signal adc_dma_iq_tvalid : std_logic;
+	signal adc_dma_iq_tdata  : std_logic_vector(31 downto 0);
+
+	--other signals
+	signal adcClk 	: std_logic;
+	signal dacClk 	: std_logic;
+	signal axiClk 	: std_logic;
+	signal rst 		: std_logic;
+
+begin
+
+	--dacif to dac
+	signal tx_i0_valid  <= dac_i0_valid;
+	signal tx_i0_enable <= dac_i0_enable;
+	signal tx_i0_data   <= dac_i0_data;
+	signal tx_q0_valid  <= dac_q0_valid;
+	signal tx_q0_enable <= dac_q0_enable;
+	signal tx_q0_data   <= dac_q0_data;
+	signal tx_i1_valid  <= dac_i1_valid;
+	signal tx_i1_enable <= dac_i1_enable;
+	signal tx_i1_data   <= dac_i1_data;
+	signal tx_q1_valid  <= dac_q1_valid;
+	signal tx_q1_enable <= dac_q1_enable;
+	signal tx_q1_data   <= dac_q1_data;
+
+	--adc to adcif
+	signal rx_i0_valid  <= adc_i0_valid;
+	signal rx_i0_enable <= adc_i0_enable;
+	signal rx_i0_data   <= adc_i0_data;
+	signal rx_q0_valid  <= dac_q0_valid;
+	signal rx_q0_enable <= dac_q0_enable;
+	signal rx_q0_data   <= dac_q0_data;
+	signal rx_i1_valid  <= dac_i1_valid;
+	signal rx_i1_enable <= dac_i1_enable;
+	signal rx_i1_data   <= dac_i1_data;
+	signal rx_q1_valid  <= dac_q1_valid;
+	signal rx_q1_enable <= dac_q1_enable;
+	signal rx_q1_data   <= dac_q1_data;
+
+	--defaults
+	signal adcClk 	<= adcClk;
+	signal dacClk 	<= dacClk;
+	signal axiClk 	<= axiClk;
+	signal rst 			<= rst;
+
+	dma_dac : dac_dmaInterface
+		port map(
+			-- Defaults
+			clk_fs <= dacClk;
+			clk_axi <= axiClk;
+			rst <= rst;
+			-- DMA AXIS Input
+			s_axis_dma_tvalid <= dac_dma_iq_tvalid;
+			s_axis_dma_tready <= dac_dma_iq_tready;
+			s_axis_dma_tdata  <= dac_dma_iq_tdata;
+
+			-- Output of IQ samples through AXIS bus
+			m_axis_i0_tready <= tx_i0_valid
+			m_axis_i0_tvalid <= tx_i0_valid;
+			m_axis_i0_tdata  <= tx_i0_data;
+
+			m_axis_q0_tready <= tx_q0_enable;
+			m_axis_q0_tvalid <= tx_q0_valid;
+			m_axis_q0_tdata  <= tx_q0_data;
+
+			m_axis_i1_tready <=
+			m_axis_i1_tvalid <=
+			m_axis_i1_tdata  <=
+
+			m_axis_q1_tready <=
+			m_axis_q1_tvalid <=
+			m_axis_q1_tdata  <=
+		);
+
+	dac_if : dacInterface
+		port map(
+			dacClk <= adcClk;
+			ethClk <= axiClk;
+			rst <= rst;
+			-- AXIS Input
+			-- AxC 0
+			s_axis_axc0_i_tready : out std_logic;
+			s_axis_axc0_i_tvalid : in std_logic;
+			s_axis_axc0_i_tdata  : in std_logic_vector(15 downto 0);
+			s_axis_axc0_q_tready : out std_logic;
+			s_axis_axc0_q_tvalid : in std_logic;
+			s_axis_axc0_q_tdata  : in std_logic_vector(15 downto 0);
+			-- AxC 1
+			s_axis_axc1_i_tready : out std_logic;
+			s_axis_axc1_i_tvalid : in std_logic;
+			s_axis_axc1_i_tdata  : in std_logic_vector(15 downto 0);
+			s_axis_axc1_q_tready : out std_logic;
+			s_axis_axc1_q_tvalid : in std_logic;
+			s_axis_axc1_q_tdata  : in std_logic_vector(15 downto 0);
+			-- AD9361 output bus
+			tx_i0_valid  <= tx_i0_valid;
+			tx_i0_enable <= tx_i0_enable;
+			tx_i0_data   <= tx_i0_data;
+			tx_q0_valid  <= tx_q0_valid;
+			tx_q0_enable <= tx_q0_enable;
+			tx_q0_data   <= tx_q0_data;
+			tx_i1_valid  <= tx_i1_valid;
+			tx_i1_enable <= tx_i1_enable;
+			tx_i1_data   <= tx_i1_data;
+			tx_q1_valid  <= tx_q1_valid;
+			tx_q1_enable <= tx_q1_enable;
+			tx_q1_data   <= tx_q1_data;
+			-- Interrupt signal to control DAC clock freq. and the
+			-- control information to be read by the interrupt
+			clkCtrlInterrupt <= open;
+			-- Status reports
+			clkCtrlInterruptInfo <= open
+
+		);
+
+
 
 end Behavioral;
