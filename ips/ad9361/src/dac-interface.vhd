@@ -228,10 +228,10 @@ begin
 	-------------------------------------------------------------------------
 
 	-- Write enable signal for the IQ FIFOs above
-	axc0_i_fifo_wr_en <= s_axis_axc0_i_tvalid --and (not full_panic_flag);
-	axc0_q_fifo_wr_en <= s_axis_axc0_q_tvalid --and (not full_panic_flag);
-	axc1_i_fifo_wr_en <= s_axis_axc1_i_tvalid --and (not full_panic_flag);
-	axc1_q_fifo_wr_en <= s_axis_axc1_q_tvalid --and (not full_panic_flag);
+	axc0_i_fifo_wr_en <= s_axis_axc0_i_tvalid; --and (not full_panic_flag);
+	axc0_q_fifo_wr_en <= s_axis_axc0_q_tvalid; --and (not full_panic_flag);
+	axc1_i_fifo_wr_en <= s_axis_axc1_i_tvalid; --and (not full_panic_flag);
+	axc1_q_fifo_wr_en <= s_axis_axc1_q_tvalid; --and (not full_panic_flag);
 
 	-- Read enable signal for the IQ FIFOs above.
 	i0_rd_en <= iq_fifo_rd_enable and tx_i0_valid and tx_i0_enable;

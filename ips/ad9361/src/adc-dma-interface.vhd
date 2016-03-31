@@ -112,15 +112,15 @@ entity adc_dmaInterface is
 		s_axis_dma_tvalid : in std_logic;
 		s_axis_dma_tready : out  std_logic;
 		s_axis_dma_tdata  : in std_logic_vector(31 downto 0);
-		
+
 		-- Input of IQ samples through AXIS bus
 		m_axis_iq_tready : in std_logic;
 		m_axis_iq_tvalid : out std_logic;
-		m_axis_iq_tdata  : out std_logic_vector(31 downto 0);
+		m_axis_iq_tdata  : out std_logic_vector(31 downto 0)
 	);
 end adc_dmaInterface;
 
-architecture Behavioral of dmaInterface is
+architecture Behavioral of adc_dmaInterface is
 
 	component axis_mux is
 	generic(

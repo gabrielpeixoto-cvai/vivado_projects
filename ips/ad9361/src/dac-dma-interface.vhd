@@ -120,11 +120,11 @@ entity dac_dmaInterface is
 
 		m_axis_q0_tready : in std_logic;
 		m_axis_q0_tvalid : out std_logic;
-		m_axis_q0_tdata  : out std_logic_vector(31 downto 0)
+		m_axis_q0_tdata  : out std_logic_vector(31 downto 0);
 
 		m_axis_i1_tready : in std_logic;
 		m_axis_i1_tvalid : out std_logic;
-		m_axis_i1_tdata  : out std_logic_vector(31 downto 0)
+		m_axis_i1_tdata  : out std_logic_vector(31 downto 0);
 
 		m_axis_q1_tready : in std_logic;
 		m_axis_q1_tvalid : out std_logic;
