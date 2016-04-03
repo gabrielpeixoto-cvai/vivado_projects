@@ -305,24 +305,24 @@ end generate;
 	--m_axis_iq_tvalid <= sig_m_axis_iq_tvalid;
 	s_axis_dma_tready <= sig_s_axis_dma_tready;
 
-	sig_fifo_stage2_AxC0_tready <= m_axis_i0_tready and m_axis_q0_tready;
-	sig_fifo_stage2_AxC0_tready <= m_axis_i1_tready and m_axis_q1_tready;
+	sig_fifo_stage1_AxC0_tready <= m_axis_i0_tready and m_axis_q0_tready;
+	sig_fifo_stage1_AxC0_tready <= m_axis_i1_tready and m_axis_q1_tready;
 
-	m_axis_i0_tdata <= sig_fifo_stage2_AxC0_tdata(15 downto 0);
-	m_axis_i0_tvalid <= sig_fifo_stage2_AxC0_tvalid;
+	m_axis_i0_tdata <= sig_fifo_stage1_AxC0_tdata(15 downto 0);
+	m_axis_i0_tvalid <= sig_fifo_stage1_AxC0_tvalid;
 	--m_axis_i0_tready <= sig_fifo_stage2_Axc0_tready;
 
-	m_axis_q0_tdata <= sig_fifo_stage2_AxC0_tdata(31 downto 16);
-	m_axis_q0_tvalid <= sig_fifo_stage2_AxC0_tvalid;
+	m_axis_q0_tdata <= sig_fifo_stage1_AxC0_tdata(31 downto 16);
+	m_axis_q0_tvalid <= sig_fifo_stage1_AxC0_tvalid;
 	--m_axis_q0_tready <= sig_fifo_stage2_Axc0_tready;
 
-	m_axis_i1_tdata <= sig_fifo_stage2_AxC1_tdata(15 downto 0);
-	--m_axis_i1_tvalid <= sig_fifo_stage2_AxC1_tvalid;
-	--m_axis_i1_tready <= '1';
+	m_axis_i1_tdata <= sig_fifo_stage1_AxC1_tdata(15 downto 0);
+	m_axis_i1_tvalid <= sig_fifo_stage1_AxC1_tvalid;
+	--m_axis_i1_tready <= sig_fifo_stage2_Axc0_tready;
 
-	m_axis_q1_tdata <= sig_fifo_stage2_AxC1_tdata(31 downto 16);
-	--m_axis_q1_tvalid <= sig_fifo_stage2_AxC1_tvalid;
-	--m_axis_q1_tready <= (others => '1');
+	m_axis_q1_tdata <= sig_fifo_stage1_AxC1_tdata(31 downto 16);
+	m_axis_q1_tvalid <= sig_fifo_stage1_AxC1_tvalid;
+	--m_axis_q1_tready <= sig_fifo_stage2_Axc0_tready;
 
 
 	-- Recognize a reception transaction from the DMA
@@ -340,7 +340,6 @@ end generate;
 --               ->- Interface FIFO ->- Internal FIFO ->-
 --
 --------------------------------------------------------------------------------
-two_AxC: if n_axc = 2 generate
 
 	demux_commutator: process(clk_axi, rst)
 	begin
@@ -443,20 +442,20 @@ two_AxC: if n_axc = 2 generate
 		axis_underflow => open
 	);
 	-- Stage 2
-	internal_fifo_axc_0 : fifo_axis_m_d64_w32_s_w32
-	PORT MAP (
-		m_aclk => clk_axi,
-		s_aclk => used_clk,
-		s_aresetn => axis_aresetn,
-		s_axis_tvalid => sig_fifo_stage1_AxC0_tvalid,
-		s_axis_tready => sig_fifo_stage1_AxC0_tready,
-		s_axis_tdata => sig_fifo_stage1_AxC0_tdata,
-		m_axis_tvalid => sig_fifo_stage2_AxC0_tvalid,
-		m_axis_tready => sig_fifo_stage2_AxC0_tready,
-		m_axis_tdata => sig_fifo_stage2_AxC0_tdata,
-		axis_overflow => open,
-		axis_underflow => open
-	);
+	--internal_fifo_axc_0 : fifo_axis_m_d64_w32_s_w32
+	--PORT MAP (
+	--	m_aclk => used_clk,
+	--	s_aclk => clk_axi,
+	--	s_aresetn => axis_aresetn,
+	--	s_axis_tvalid => sig_fifo_stage1_AxC0_tvalid,
+	--	s_axis_tready => sig_fifo_stage1_AxC0_tready,
+	--	s_axis_tdata => sig_fifo_stage1_AxC0_tdata,
+	--	m_axis_tvalid => sig_fifo_stage2_AxC0_tvalid,
+	--	m_axis_tready => sig_fifo_stage2_AxC0_tready,
+	--	m_axis_tdata => sig_fifo_stage2_AxC0_tdata,
+	--	axis_overflow => open,
+	--	axis_underflow => open
+	--);
 
 	--------------
 	--- AxC 1
@@ -477,21 +476,21 @@ two_AxC: if n_axc = 2 generate
 		axis_overflow => open,
 		axis_underflow => open
 	);
-	-- Stage 2
-	internal_fifo_axc_1 : fifo_axis_m_d64_w32_s_w32
-	PORT MAP (
-		m_aclk => clk_axi,
-		s_aclk => used_clk,
-		s_aresetn => axis_aresetn,
-		s_axis_tvalid => sig_fifo_stage1_AxC1_tvalid,
-		s_axis_tready => sig_fifo_stage1_AxC1_tready,
-		s_axis_tdata => sig_fifo_stage1_AxC1_tdata,
-		m_axis_tvalid => sig_fifo_stage2_AxC1_tvalid,
-		m_axis_tready => sig_fifo_stage2_AxC1_tready,
-		m_axis_tdata => sig_fifo_stage2_AxC1_tdata,
-		axis_overflow => open,
-		axis_underflow => open
-	);
+	---- Stage 2
+	--internal_fifo_axc_1 : fifo_axis_m_d64_w32_s_w32
+	--PORT MAP (
+	--	m_aclk => clk_axi,
+	--	s_aclk => used_clk,
+	--	s_aresetn => axis_aresetn,
+	--	s_axis_tvalid => sig_fifo_stage1_AxC1_tvalid,
+	--	s_axis_tready => sig_fifo_stage1_AxC1_tready,
+	--	s_axis_tdata => sig_fifo_stage1_AxC1_tdata,
+	--	m_axis_tvalid => sig_fifo_stage2_AxC1_tvalid,
+	--	m_axis_tready => sig_fifo_stage2_AxC1_tready,
+	--	m_axis_tdata => sig_fifo_stage2_AxC1_tdata,
+	--	axis_overflow => open,
+	--	axis_underflow => open
+	--);
 
 	------------------------
 	-- Multiplexer
@@ -524,7 +523,5 @@ two_AxC: if n_axc = 2 generate
 	--	m_axis_tdata   => m_axis_iq_tdata,
 	--	m_axis_tvalid  => sig_m_axis_iq_tvalid
 	--);
-
-end generate;
 
 end Behavioral;

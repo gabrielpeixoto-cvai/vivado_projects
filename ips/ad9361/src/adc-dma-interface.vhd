@@ -110,7 +110,7 @@ entity adc_dmaInterface is
 		rst : in std_logic;
 		-- input from adc
 		s_axis_adc_tvalid : in std_logic;
-		s_axis_adc_tready : out  std_logic;
+		s_axis_adc_tready : in  std_logic;
 		s_axis_adc_tdata  : in std_logic_vector(31 downto 0);
 
 		-- Outuput to dma
@@ -289,7 +289,7 @@ end generate;
 	axis_aresetn <= not rst;
 
 	-- Output ports used to recognize transmit and receive transactions:
-	s_axis_adc_tready <= sig_s_axis_adc_tready;
+	--s_axis_adc_tready <= sig_s_axis_adc_tready;
 	m_axis_dma_tvalid <= sig_m_axis_dma_tvalid;
 
 	--m_axis_i0_data <= sig_fifo_stage2_AxC0_tdata(15 downto 0);
@@ -371,7 +371,7 @@ two_AxC: if n_axc = 2 generate
 		-- Receive Stream: Axi Stream Slave
 		RXD_S_AXIS_ACLK     => clk_axi  ,
 		RXD_S_AXIS_ARESETN  => axis_aresetn,
-		RXD_S_AXIS_TREADY   => sig_s_axis_adc_tready ,
+		RXD_S_AXIS_TREADY   =>  open,
 		RXD_S_AXIS_TDATA    => s_axis_adc_tdata ,
 		RXD_S_AXIS_TLAST    => '0' ,
 		RXD_S_AXIS_TVALID   => s_axis_adc_tvalid ,
