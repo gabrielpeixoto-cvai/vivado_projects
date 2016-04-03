@@ -305,8 +305,8 @@ end generate;
 	--m_axis_iq_tvalid <= sig_m_axis_iq_tvalid;
 	s_axis_dma_tready <= sig_s_axis_dma_tready;
 
-	--sig_fifo_stage1_AxC0_tready <= m_axis_i0_tready and m_axis_q0_tready;
-	sig_fifo_stage1_AxC0_tready <= m_axis_i1_tready and m_axis_q1_tready;
+	sig_fifo_stage1_AxC0_tready <= m_axis_i0_tready and m_axis_q0_tready;
+	sig_fifo_stage1_AxC1_tready <= m_axis_i1_tready and m_axis_q1_tready;
 
 	m_axis_i0_tdata <= sig_fifo_stage1_AxC0_tdata(15 downto 0);
 	m_axis_i0_tvalid <= sig_fifo_stage1_AxC0_tvalid;
