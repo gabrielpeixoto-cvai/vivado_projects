@@ -100,7 +100,7 @@ use UNISIM.VComponents.all;
 entity adc_dmaInterface is
 	generic(
 		n_axc : integer := 2;
-		--compression_ratio  : integer := 1;
+		compression_ratio  : integer := 2;
 		dma_read_data_type : string  := "raw"
 	);
 	port(
@@ -108,15 +108,15 @@ entity adc_dmaInterface is
 		clk_fs : in std_logic;
 		clk_axi : in std_logic;
 		rst : in std_logic;
-		-- DMA AXIS Input
-		s_axis_dma_tvalid : in std_logic;
-		s_axis_dma_tready : out  std_logic;
-		s_axis_dma_tdata  : in std_logic_vector(31 downto 0);
+		-- input from adc
+		s_axis_adc_tvalid : in std_logic;
+		s_axis_adc_tready : out  std_logic;
+		s_axis_adc_tdata  : in std_logic_vector(31 downto 0);
 
-		-- Input of IQ samples through AXIS bus
-		m_axis_iq_tready : in std_logic;
-		m_axis_iq_tvalid : out std_logic;
-		m_axis_iq_tdata  : out std_logic_vector(31 downto 0)
+		-- Outuput to dma
+		m_axis_dma_tready : in std_logic;
+		m_axis_dma_tvalid : out std_logic;
+		m_axis_dma_tdata  : out std_logic_vector(31 downto 0)
 	);
 end adc_dmaInterface;
 
@@ -228,10 +228,10 @@ architecture Behavioral of adc_dmaInterface is
 	signal axis_aresetn : std_logic;
 
 	-- For Receive and Transmit transactions:
-	signal dma_rx_transaction : std_logic;
+	signal adc_rx_transaction : std_logic;
 	signal downstream_tx_transaction : std_logic;
-	signal sig_s_axis_dma_tready : std_logic;
-	signal sig_m_axis_iq_tvalid : std_logic;
+	signal sig_s_axis_adc_tready : std_logic;
+	signal sig_m_axis_dma_tvalid : std_logic;
 
 	-- Select signals for the Mux and the Demux
 	signal mux_select : unsigned(1 downto 0);
@@ -289,28 +289,29 @@ end generate;
 	axis_aresetn <= not rst;
 
 	-- Output ports used to recognize transmit and receive transactions:
-	s_axis_dma_tready <= sig_s_axis_dma_tready;
+	s_axis_adc_tready <= sig_s_axis_adc_tready;
+	m_axis_dma_tvalid <= sig_m_axis_dma_tvalid;
 
-	m_axis_i0_data <= sig_fifo_stage2_AxC0_tdata(15 downto 0);
-	m_axis_i0_tvalid <= sig_m_axis_iq_tvalid;
-	m_axis_i0_tready <= sig_fifo_stage2_AxC0_tready;
+	--m_axis_i0_data <= sig_fifo_stage2_AxC0_tdata(15 downto 0);
+	--m_axis_i0_tvalid <= sig_m_axis_iq_tvalid;
+	--m_axis_i0_tready <= sig_fifo_stage2_AxC0_tready;
 
-	m_axis_q0_data <= sig_fifo_stage2_AxC0_tdata(31 downto 16);
-	m_axis_q0_tvalid <= sig_m_axis_iq_tvalid;
-	m_axis_q0_tready <= sig_fifo_stage2_AxC0_tready;
+	--m_axis_q0_data <= sig_fifo_stage2_AxC0_tdata(31 downto 16);
+	--m_axis_q0_tvalid <= sig_m_axis_iq_tvalid;
+	--m_axis_q0_tready <= sig_fifo_stage2_AxC0_tready;
 
-	m_axis_i1_data <= sig_fifo_stage2_AxC1_tdata(15 downto 0);
-	m_axis_i1_tvalid <= sig_m_axis_iq_tvalid;
-	m_axis_i1_tready <= sig_fifo_stage2_AxC1_tready;
+	--m_axis_i1_data <= sig_fifo_stage2_AxC1_tdata(15 downto 0);
+	--m_axis_i1_tvalid <= sig_m_axis_iq_tvalid;
+	--m_axis_i1_tready <= sig_fifo_stage2_AxC1_tready;
 
-	m_axis_q1_data <= sig_fifo_stage2_AxC1_tdata(31 downto 16);
-	m_axis_q1_tvalid <= sig_m_axis_iq_tvalid;
-	m_axis_q1_tready <= sig_fifo_stage2_AxC1_tready;
+	--m_axis_dma_data <= sig_fifo_stage2_AxC1_tdata(31 downto 0);
+	--m_axis_dma_tvalid <= sig_m_axis_iq_tvalid;
+	--m_axis_dma_tready <= sig_fifo_stage2_AxC1_tready;
 
 	-- Recognize a reception transaction from the DMA
-	dma_rx_transaction <= s_axis_dma_tvalid and sig_s_axis_dma_tready;
+	adc_rx_transaction <= s_axis_adc_tvalid and sig_s_axis_adc_tready;
 	-- Recognize a transmission towards the downstream module (CPRI Packer)
-	downstream_tx_transaction <= sig_m_axis_iq_tvalid and m_axis_iq_tready;
+	downstream_tx_transaction <= sig_m_axis_dma_tvalid and m_axis_dma_tready;
 
 
 --------------------------------------------------------------------------------
@@ -330,7 +331,7 @@ two_AxC: if n_axc = 2 generate
 		if (rst = '1') then
 			demux_select <= (others => '0');
 		elsif (rising_edge(clk_axi)) then
-			if (dma_rx_transaction = '1') then
+			if (adc_rx_transaction = '1') then
 				if (demux_select = to_unsigned(n_axc - 1, 2)) then
 					demux_select <= (others => '0');
 				else
@@ -370,10 +371,10 @@ two_AxC: if n_axc = 2 generate
 		-- Receive Stream: Axi Stream Slave
 		RXD_S_AXIS_ACLK     => clk_axi  ,
 		RXD_S_AXIS_ARESETN  => axis_aresetn,
-		RXD_S_AXIS_TREADY   => sig_s_axis_dma_tready ,
-		RXD_S_AXIS_TDATA    => s_axis_dma_tdata ,
+		RXD_S_AXIS_TREADY   => sig_s_axis_adc_tready ,
+		RXD_S_AXIS_TDATA    => s_axis_adc_tdata ,
 		RXD_S_AXIS_TLAST    => '0' ,
-		RXD_S_AXIS_TVALID   => s_axis_dma_tvalid ,
+		RXD_S_AXIS_TVALID   => s_axis_adc_tvalid ,
 		RXD_S_AXIS_TUSER    => (others => '0'),
 		RXD_S_AXIS_TKEEP    => (others => '1'),
 		-- Transmit Stream: Axi Stream Master 0
@@ -503,9 +504,9 @@ two_AxC: if n_axc = 2 generate
 		s_axis_rx3_tdata    => (others => '0'),
 		s_axis_rx3_tvalid   => '0',
 		-- Transmit Stream
-		m_axis_tready  => m_axis_iq_tready,
-		m_axis_tdata   => m_axis_iq_tdata,
-		m_axis_tvalid  => sig_m_axis_iq_tvalid
+		m_axis_tready  => m_axis_dma_tready,
+		m_axis_tdata   => m_axis_dma_tdata,
+		m_axis_tvalid  => sig_m_axis_dma_tvalid
 	);
 
 end generate;

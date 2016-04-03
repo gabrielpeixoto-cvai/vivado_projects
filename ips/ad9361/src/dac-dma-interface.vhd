@@ -116,19 +116,19 @@ entity dac_dmaInterface is
 		-- Output of IQ samples through AXIS bus
 		m_axis_i0_tready : in std_logic;
 		m_axis_i0_tvalid : out std_logic;
-		m_axis_i0_tdata  : out std_logic_vector(31 downto 0);
+		m_axis_i0_tdata  : out std_logic_vector(15 downto 0);
 
 		m_axis_q0_tready : in std_logic;
 		m_axis_q0_tvalid : out std_logic;
-		m_axis_q0_tdata  : out std_logic_vector(31 downto 0);
+		m_axis_q0_tdata  : out std_logic_vector(15 downto 0);
 
 		m_axis_i1_tready : in std_logic;
 		m_axis_i1_tvalid : out std_logic;
-		m_axis_i1_tdata  : out std_logic_vector(31 downto 0);
+		m_axis_i1_tdata  : out std_logic_vector(15 downto 0);
 
 		m_axis_q1_tready : in std_logic;
 		m_axis_q1_tvalid : out std_logic;
-		m_axis_q1_tdata  : out std_logic_vector(31 downto 0)
+		m_axis_q1_tdata  : out std_logic_vector(15 downto 0)
 	);
 
 end dac_dmaInterface;
@@ -302,30 +302,33 @@ end generate;
 	axis_aresetn <= not rst;
 
 	-- Output ports used to recognize transmit and receive transactions:
-	m_axis_iq_tvalid <= sig_m_axis_iq_tvalid;
+	--m_axis_iq_tvalid <= sig_m_axis_iq_tvalid;
 	s_axis_dma_tready <= sig_s_axis_dma_tready;
 
-	m_axis_i0_data <= sig_fifo_stage2_AxC0_tdata(15 downto 0);
-	m_axis_i0_tvalid <= sig_m_axis_iq_tvalid;
-	m_axis_i0_tready <= sig_fifo_stage2_AxC0_tready;
+	sig_fifo_stage2_AxC0_tready <= m_axis_i0_tready and m_axis_q0_tready;
+	sig_fifo_stage2_AxC0_tready <= m_axis_i1_tready and m_axis_q1_tready;
 
-	m_axis_q0_data <= sig_fifo_stage2_AxC0_tdata(31 downto 16);
-	m_axis_q0_tvalid <= sig_m_axis_iq_tvalid;
-	m_axis_q0_tready <= sig_fifo_stage2_AxC0_tready;
+	m_axis_i0_tdata <= sig_fifo_stage2_AxC0_tdata(15 downto 0);
+	m_axis_i0_tvalid <= sig_fifo_stage2_AxC0_tvalid;
+	--m_axis_i0_tready <= sig_fifo_stage2_Axc0_tready;
 
-	m_axis_i1_data <= sig_fifo_stage2_AxC1_tdata(15 downto 0);
-	m_axis_i1_tvalid <= sig_m_axis_iq_tvalid;
-	m_axis_i1_tready <= sig_fifo_stage2_AxC1_tready;
+	m_axis_q0_tdata <= sig_fifo_stage2_AxC0_tdata(31 downto 16);
+	m_axis_q0_tvalid <= sig_fifo_stage2_AxC0_tvalid;
+	--m_axis_q0_tready <= sig_fifo_stage2_Axc0_tready;
 
-	m_axis_q1_data <= sig_fifo_stage2_AxC1_tdata(31 downto 16);
-	m_axis_q1_tvalid <= sig_m_axis_iq_tvalid;
-	m_axis_q1_tready <= sig_fifo_stage2_AxC1_tready;
+	m_axis_i1_tdata <= sig_fifo_stage2_AxC1_tdata(15 downto 0);
+	--m_axis_i1_tvalid <= sig_fifo_stage2_AxC1_tvalid;
+	--m_axis_i1_tready <= '1';
+
+	m_axis_q1_tdata <= sig_fifo_stage2_AxC1_tdata(31 downto 16);
+	--m_axis_q1_tvalid <= sig_fifo_stage2_AxC1_tvalid;
+	--m_axis_q1_tready <= (others => '1');
 
 
 	-- Recognize a reception transaction from the DMA
 	dma_rx_transaction <= s_axis_dma_tvalid and sig_s_axis_dma_tready;
 	-- Recognize a transmission towards the downstream module (CPRI Packer)
-	downstream_tx_transaction <= sig_m_axis_iq_tvalid and m_axis_iq_tready;
+	--downstream_tx_transaction <= sig_m_axis_iq_tvalid and m_axis_i0_tready and m_axis_q0_tready and m_axis_i1_tready and m_axis_q1_tready;
 
 --------------------------------------------------------------------------------
 -- CASE #2: 2 AxC
@@ -484,8 +487,8 @@ two_AxC: if n_axc = 2 generate
 		s_axis_tready => sig_fifo_stage1_AxC1_tready,
 		s_axis_tdata => sig_fifo_stage1_AxC1_tdata,
 		m_axis_tvalid => sig_fifo_stage2_AxC1_tvalid,
-		m_axis_tready => m_axis_iq_tready,--sig_fifo_stage2_AxC1_tready,
-		m_axis_tdata => m_axis_iq_tdata,--sig_fifo_stage2_AxC1_tdata,
+		m_axis_tready => sig_fifo_stage2_AxC1_tready,
+		m_axis_tdata => sig_fifo_stage2_AxC1_tdata,
 		axis_overflow => open,
 		axis_underflow => open
 	);
