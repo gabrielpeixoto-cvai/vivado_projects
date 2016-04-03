@@ -26,7 +26,7 @@ set root_dir "$origin_dir/.."
 ######################################################################
 
 # ad9361_mode: "DATA_IF", "NO_DATA"
-set ::ad9361_mode "NO_DATA"
+set ::ad9361_mode "DATA_IF"
 # board: "VC707", "VC709"
 set ::board "VC707"
 
