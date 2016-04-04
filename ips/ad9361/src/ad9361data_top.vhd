@@ -16,7 +16,7 @@ entity ad9361_data is
 	);
 	port(
 		-- Defaults
-		dacClk : in std_logic;
+		adClk : in std_logic;
 		axiClk : in std_logic;
 		rst : in std_logic;
 
@@ -304,7 +304,7 @@ begin
 
 	dac_if : dacInterface
 		port map(
-			dacClk => adcClk,
+			dacClk => clk_fs,
 			ethClk => axiClk,
 			rst => rst,
 			-- AXIS Input
@@ -346,7 +346,7 @@ begin
 		dma_adc : adc_dmaInterface
 			port map(
 				-- Defaults
-				clk_fs => dacClk,
+				clk_fs => clk_fs,
 				clk_axi => axiClk,
 				rst => rst,
 				-- ADC Input
@@ -362,7 +362,7 @@ begin
 
 		adc_if : adcInterface
 			port map(
-				adcClk => adcClk,
+				clk_fs => clk_fs,
 				axiClk => axiClk,
 				rst => rst,
 

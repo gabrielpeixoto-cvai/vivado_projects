@@ -100,7 +100,7 @@ use UNISIM.VComponents.all;
 entity dac_dmaInterface is
 	generic(
 		n_axc : integer := 2;
-		compression_ratio  : integer := 1;
+		compression_ratio  : integer := 0;
 		dma_read_data_type : string  := "raw"
 	);
 	port(
