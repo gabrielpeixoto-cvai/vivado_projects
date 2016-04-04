@@ -334,6 +334,9 @@ if {$::ad9361_mode == "NO_DATA"} {
 	connect_bd_net [get_bd_pins ad9361_dma/s_axis_s2mm_tdata] [get_bd_pins ad9361_data_0/adc_dma_iq_tdata]
 	connect_bd_net [get_bd_pins ad9361_data_0/adc_dma_iq_tvalid] [get_bd_pins ad9361_dma/s_axis_s2mm_tvalid]
 	connect_bd_net [get_bd_pins ad9361_dma/s_axis_s2mm_tready] [get_bd_pins ad9361_data_0/adc_dma_iq_tready]
+
+	connect_bd_net [get_bd_pins ad9361_dma/mm2s_introut] [get_bd_pins microblaze_0_xlconcat/In3]
+	connect_bd_net [get_bd_pins ad9361_dma/s2mm_introut] [get_bd_pins microblaze_0_xlconcat/In4]
 }
 
 
