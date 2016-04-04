@@ -151,6 +151,19 @@ if {$::board == "VC707"} {
 	# Create instance: ad9361_comm_0, and set properties
 	set ad9361_comm_0 [ create_bd_cell -type ip -vlnv LaPS:user:ad9361_comm:1.0 ad9361_comm_0 ]
 
+	#create dac_dma and update for no scatter gather
+	create_bd_cell -type ip -vlnv xilinx.com:ip:axi_dma:7.1 axi_dma_1
+	set_property name dac_dma [get_bd_cells axi_dma_1]
+	set_property -dict [list CONFIG.c_include_sg {0} CONFIG.c_sg_include_stscntrl_strm {0}] [get_bd_cells dac_dma]
+
+	#create adc_dma and update for no scatter gather
+	create_bd_cell -type ip -vlnv xilinx.com:ip:axi_dma:7.1 axi_dma_0
+	set_property name adc_dma [get_bd_cells axi_dma_0]
+	set_property -dict [list CONFIG.c_include_sg {0} CONFIG.c_sg_include_stscntrl_strm {0}] [get_bd_cells adc_dma]
+
+	#create instance: ad9361_data_0, and set properties
+	create_bd_cell -type ip -vlnv LaPS:user:ad9361_data:1.0 ad9361_data_0
+
 	# Create instance: axi_ad9361_0, and set properties
 	set axi_ad9361_0 [ create_bd_cell -type ip -vlnv analog.com:user:axi_ad9361:1.0 axi_ad9361_0 ]
 	# Configurations for the AD9361:
@@ -172,6 +185,17 @@ if {$::board == "VC707"} {
 
 	# Connect the SPI as AXI Slave
 	apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {Master "/microblaze_0 (Periph)" Clk "Auto" }  [get_bd_intf_pins fmcomms2_spi/AXI_LITE]
+
+	#dac_dma automations
+	apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {Master "/microblaze_0 (Periph)" Clk "Auto" }  [get_bd_intf_pins dac_dma/S_AXI_LITE]
+	apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {Slave "/mig_7series_0/S_AXI" Clk "Auto" }  [get_bd_intf_pins dac_dma/M_AXI_MM2S]
+	apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {Slave "/mig_7series_0/S_AXI" Clk "Auto" }  [get_bd_intf_pins dac_dma/M_AXI_S2MM]
+
+
+	#adc_dma automations
+	apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {Master "/microblaze_0 (Periph)" Clk "Auto" }  [get_bd_intf_pins adc_dma/S_AXI_LITE]
+	apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {Slave "/mig_7series_0/S_AXI" Clk "Auto" }  [get_bd_intf_pins adc_dma/M_AXI_MM2S]
+	apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {Slave "/mig_7series_0/S_AXI" Clk "Auto" }  [get_bd_intf_pins adc_dma/M_AXI_S2MM]
 
 
 
@@ -275,7 +299,48 @@ if {$::ad9361_mode == "NO_DATA"} {
 	#connect_bd_net [get_bd_pins /axi_ad9361_0/dac_data_q1] [get_bd_ports dac_data_q1]
 
 } elseif {$::ad9361_mode == "DATA_IF"} {
-	##TODO
+
+	connect_bd_net [get_bd_pins ad9361_data_0/dac_i0_data] [get_bd_pins axi_ad9361_0/dac_data_i0]
+	connect_bd_net [get_bd_pins ad9361_data_0/dac_q0_data] [get_bd_pins axi_ad9361_0/dac_data_q0]
+	connect_bd_net [get_bd_pins ad9361_data_0/dac_i1_data] [get_bd_pins axi_ad9361_0/dac_data_i1]
+	connect_bd_net [get_bd_pins ad9361_data_0/dac_q1_data] [get_bd_pins axi_ad9361_0/dac_data_q1]
+	connect_bd_net [get_bd_pins ad9361_data_0/adc_q1_data] [get_bd_pins axi_ad9361_0/adc_data_q1]
+
+	connect_bd_net [get_bd_pins ad9361_data_0/adc_q1_enable] [get_bd_pins axi_ad9361_0/adc_enable_q1]
+	connect_bd_net [get_bd_pins ad9361_data_0/adc_q1_valid] [get_bd_pins axi_ad9361_0/adc_valid_q1]
+	connect_bd_net [get_bd_pins ad9361_data_0/adc_i1_data] [get_bd_pins axi_ad9361_0/adc_data_i1]
+	connect_bd_net [get_bd_pins ad9361_data_0/adc_i1_enable] [get_bd_pins axi_ad9361_0/adc_enable_i1]
+	connect_bd_net [get_bd_pins ad9361_data_0/adc_i1_valid] [get_bd_pins axi_ad9361_0/adc_valid_i1]
+
+	connect_bd_net [get_bd_pins ad9361_data_0/adc_q0_data] [get_bd_pins axi_ad9361_0/adc_data_q0]
+	connect_bd_net [get_bd_pins axi_ad9361_0/adc_valid_q0] [get_bd_pins ad9361_data_0/adc_q0_valid]
+	connect_bd_net [get_bd_pins ad9361_data_0/adc_q0_enable] [get_bd_pins axi_ad9361_0/adc_enable_q0]
+	connect_bd_net [get_bd_pins axi_ad9361_0/adc_data_i0] [get_bd_pins ad9361_data_0/adc_i0_data]
+	connect_bd_net [get_bd_pins axi_ad9361_0/adc_valid_i0] [get_bd_pins ad9361_data_0/adc_i0_valid]
+	connect_bd_net [get_bd_pins ad9361_data_0/adc_i0_enable] [get_bd_pins axi_ad9361_0/adc_enable_i0]
+	connect_bd_net [get_bd_pins axi_ad9361_0/dac_enable_i0] [get_bd_pins ad9361_data_0/dac_i0_enable]
+	connect_bd_net [get_bd_pins axi_ad9361_0/dac_valid_i0] [get_bd_pins ad9361_data_0/dac_i0_valid]
+	connect_bd_net [get_bd_pins axi_ad9361_0/dac_enable_q0] [get_bd_pins ad9361_data_0/dac_q0_enable]
+	connect_bd_net [get_bd_pins axi_ad9361_0/dac_valid_q0] [get_bd_pins ad9361_data_0/dac_q0_valid]
+	connect_bd_net [get_bd_pins axi_ad9361_0/dac_enable_i1] [get_bd_pins ad9361_data_0/dac_i1_enable]
+	connect_bd_net [get_bd_pins axi_ad9361_0/dac_valid_i1] [get_bd_pins ad9361_data_0/dac_i1_valid]
+	connect_bd_net [get_bd_pins ad9361_data_0/dac_q1_valid] [get_bd_pins axi_ad9361_0/dac_valid_q1]
+	connect_bd_net [get_bd_pins ad9361_data_0/dac_q1_enable] [get_bd_pins axi_ad9361_0/dac_enable_q1]
+	connect_bd_net -net [get_bd_nets microblaze_0_Clk] [get_bd_pins ad9361_data_0/axiClk] [get_bd_pins mig_7series_0/ui_clk]
+	connect_bd_net [get_bd_pins axi_ad9361_0/rst] [get_bd_pins ad9361_data_0/rst]
+
+	#temporary clocks
+	connect_bd_net -net [get_bd_nets microblaze_0_Clk] [get_bd_pins ad9361_data_0/adcClk] [get_bd_pins mig_7series_0/ui_clk]
+	connect_bd_net -net [get_bd_nets microblaze_0_Clk] [get_bd_pins ad9361_data_0/dacClk] [get_bd_pins mig_7series_0/ui_clk]
+
+	#dma_ports
+	connect_bd_net [get_bd_pins dac_dma/m_axis_mm2s_tvalid] [get_bd_pins ad9361_data_0/dac_dma_iq_tvalid]
+	connect_bd_net [get_bd_pins dac_dma/m_axis_mm2s_tdata] [get_bd_pins ad9361_data_0/dac_dma_iq_tdata]
+	connect_bd_net [get_bd_pins ad9361_data_0/dac_dma_iq_tready] [get_bd_pins dac_dma/m_axis_mm2s_tready]
+
+	connect_bd_net [get_bd_pins adc_dma/s_axis_s2mm_tdata] [get_bd_pins ad9361_data_0/adc_dma_iq_tdata]
+	connect_bd_net [get_bd_pins ad9361_data_0/adc_dma_iq_tvalid] [get_bd_pins adc_dma/s_axis_s2mm_tvalid]
+	connect_bd_net [get_bd_pins adc_dma/s_axis_s2mm_tready] [get_bd_pins ad9361_data_0/adc_dma_iq_tready]
 }
 
 
