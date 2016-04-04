@@ -16,7 +16,6 @@ entity ad9361_data is
 	);
 	port(
 		-- Defaults
-		adcClk : in std_logic;
 		dacClk : in std_logic;
 		axiClk : in std_logic;
 		rst : in std_logic;
@@ -242,52 +241,42 @@ architecture Behavioral of ad9361_data is
 	signal sig_adc_dma_iq_tvalid : std_logic;
 	signal sig_adc_dma_iq_tdata  : std_logic_vector(31 downto 0);
 
-	--other signals
-	--signal adcClk 	: std_logic;
-	--signal dacClk 	: std_logic;
-	--signal axiClk 	: std_logic;
-	--signal rst 		: std_logic;
+	-- Clock frequency at the sampling frequency
+	signal bufr_out : std_logic;
+	signal clk_fs : std_logic;
 
 begin
 
-	--dacif to dac
-	--tx_i0_valid  <= dac_i0_valid;
-	--tx_i0_enable <= dac_i0_enable;
-	--tx_i0_data   <= dac_i0_data;
-	--tx_q0_valid  <= dac_q0_valid;
-	--tx_q0_enable <= dac_q0_enable;
-	--tx_q0_data   <= dac_q0_data;
-	--tx_i1_valid  <= dac_i1_valid;
-	--tx_i1_enable <= dac_i1_enable;
-	--tx_i1_data   <= dac_i1_data;
-	--tx_q1_valid  <= dac_q1_valid;
-	--tx_q1_enable <= dac_q1_enable;
-	--tx_q1_data   <= dac_q1_data;
+--------------------------------------------------------------------------------
+-- `lclk` is by default at 4 * sampling frequency. However, both the
+-- cpriEmulator and the dmaInterface require the exact sampling frequency. The
+-- following modules generate such a clock.
+--------------------------------------------------------------------------------
 
-	--adc to adcif
-	--adc_rx_i0_valid  <= adc_i0_valid;
-	--adc_rx_i0_enable <= adc_i0_enable;
-	--adc_rx_i0_data   <= adc_i0_data;
-	--adc_rx_q0_valid  <= adc_q0_valid;
-	--adc_rx_q0_enable <= adc_q0_enable;
-	--adc_rx_q0_data   <= adc_q0_data;
-	--adc_rx_i1_valid  <= adc_i1_valid;
-	--adc_rx_i1_enable <= adc_i1_enable;
-	--adc_rx_i1_data   <= adc_i1_data;
-	--adc_rx_q1_valid  <= adc_q1_valid;
-	--adc_rx_q1_enable <= adc_q1_enable;
-	--adc_rx_q1_data   <= adc_q1_data;
+	BUFR_inst : BUFR
+	generic map (
+		BUFR_DIVIDE => "4",      -- Values: "BYPASS, 1, 2, 3, 4, 5, 6, 7, 8"
+		SIM_DEVICE => "7SERIES"  -- Must be set to "7SERIES"
+	)
+	port map (
+		O => bufr_out,  -- Clock output port
+		CE => '1',    -- Active high, clock enable (Divided modes only)
+		CLR => '0',   -- Active high, asynchronous clear (Divided modes only)
+		I => adcClk  -- Clock buffer input
+	);
 
-	--defaults
-	--adcClk 	<= adcClk;
-	--dacClk 	<= dacClk;
-	--axiClk 	<= axiClk;
-	--rst 			<= rst;
+	BUFG_inst : BUFG
+	port map (
+		O => clk_fs, -- 1-bit output: Clock output
+		I => bufr_out  -- 1-bit input: Clock input
+	);
+
+--------------------------------------------------------------------------------
 
 	dma_dac : dac_dmaInterface
 		port map(
 			-- Defaults
-			clk_fs => dacClk,
+			clk_fs => clk_fs,
 			clk_axi => axiClk,
 			rst => rst,
 			-- DMA AXIS Input
