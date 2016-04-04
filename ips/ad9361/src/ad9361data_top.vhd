@@ -5,6 +5,9 @@ use IEEE.STD_LOGIC_1164.ALL;
 -- arithmetic functions with Signed or Unsigned values
 use IEEE.NUMERIC_STD.ALL;
 
+library UNISIM;
+use UNISIM.VComponents.all;
+
 -- Uncomment the following library declaration if instantiating
 -- any Xilinx primitives in this code.
 --library UNISIM;
@@ -262,7 +265,7 @@ begin
 		O => bufr_out,  -- Clock output port
 		CE => '1',    -- Active high, clock enable (Divided modes only)
 		CLR => '0',   -- Active high, asynchronous clear (Divided modes only)
-		I => adcClk  -- Clock buffer input
+		I => adClk  -- Clock buffer input
 	);
 
 	BUFG_inst : BUFG
@@ -362,7 +365,7 @@ begin
 
 		adc_if : adcInterface
 			port map(
-				clk_fs => clk_fs,
+				adcClk => clk_fs,
 				axiClk => axiClk,
 				rst => rst,
 
