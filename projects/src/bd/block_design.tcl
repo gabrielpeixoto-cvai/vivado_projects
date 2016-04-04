@@ -154,7 +154,7 @@ if {$::board == "VC707"} {
 	#create ad9361_dma and update for no scatter gather
 	create_bd_cell -type ip -vlnv xilinx.com:ip:axi_dma:7.1 axi_dma_0
 	set_property name ad9361_dma [get_bd_cells axi_dma_0]
-	set_property -dict [list CONFIG.c_include_sg {0} CONFIG.c_sg_include_stscntrl_strm {0}] [get_bd_cells ad9361_dma]
+	#set_property -dict [list CONFIG.c_include_sg {0} CONFIG.c_sg_include_stscntrl_strm {0}] [get_bd_cells ad9361_dma]
 
 	#create instance: ad9361_data_0, and set properties
 	create_bd_cell -type ip -vlnv LaPS:user:ad9361_data:1.0 ad9361_data_0
@@ -181,10 +181,11 @@ if {$::board == "VC707"} {
 	# Connect the SPI as AXI Slave
 	apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {Master "/microblaze_0 (Periph)" Clk "Auto" }  [get_bd_intf_pins fmcomms2_spi/AXI_LITE]
 
-	#dac_dma automations
+	#ad9361_dma automations
 	apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {Master "/microblaze_0 (Periph)" Clk "Auto" }  [get_bd_intf_pins ad9361_dma/S_AXI_LITE]
 	apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {Slave "/mig_7series_0/S_AXI" Clk "Auto" }  [get_bd_intf_pins ad9361_dma/M_AXI_MM2S]
 	apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {Slave "/mig_7series_0/S_AXI" Clk "Auto" }  [get_bd_intf_pins ad9361_dma/M_AXI_S2MM]
+	apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {Slave "/mig_7series_0/S_AXI" Clk "Auto" }  [get_bd_intf_pins ad9361_dma/M_AXI_SG]
 
 
 
@@ -319,8 +320,11 @@ if {$::ad9361_mode == "NO_DATA"} {
 	connect_bd_net [get_bd_pins axi_ad9361_0/rst] [get_bd_pins ad9361_data_0/rst]
 
 	#temporary clocks
-	connect_bd_net -net [get_bd_nets microblaze_0_Clk] [get_bd_pins ad9361_data_0/adcClk] [get_bd_pins mig_7series_0/ui_clk]
-	connect_bd_net -net [get_bd_nets microblaze_0_Clk] [get_bd_pins ad9361_data_0/dacClk] [get_bd_pins mig_7series_0/ui_clk]
+	#connect_bd_net -net [get_bd_nets microblaze_0_Clk] [get_bd_pins ad9361_data_0/adcClk] [get_bd_pins mig_7series_0/ui_clk]
+	#connect_bd_net -net [get_bd_nets microblaze_0_Clk] [get_bd_pins ad9361_data_0/dacClk] [get_bd_pins mig_7series_0/ui_clk]
+
+	#ad9361 clock
+	connect_bd_net -net [get_bd_nets axi_ad9361_0_l_clk] [get_bd_pins ad9361_data_0/adClk] [get_bd_pins axi_ad9361_0/l_clk]
 
 	#dma_ports
 	connect_bd_net [get_bd_pins ad9361_dma/m_axis_mm2s_tvalid] [get_bd_pins ad9361_data_0/dac_dma_iq_tvalid]
