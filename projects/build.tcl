@@ -80,7 +80,7 @@ set_property used_in_synthesis false [get_files  $origin_dir/$proj_name/$proj_na
 # Synthesis
 #
 ######################################################################
-if 0 {
+if 1 {
     save_bd_design
     validate_bd_design
 
