@@ -153,10 +153,7 @@ if {$::board == "VC707"} {
 
 	#create adc_dma and dac_dma
 	create_bd_cell -type ip -vlnv xilinx.com:ip:axi_dma:7.1 axi_dma_0
-	set_property name dac_dma [get_bd_cells axi_dma_0]
-
-	create_bd_cell -type ip -vlnv xilinx.com:ip:axi_dma:7.1 axi_dma_1
-	set_property name adc_dma [get_bd_cells axi_dma_1]
+	set_property name ad9361_dma [get_bd_cells axi_dma_0]
 
 
 	#create instance: ad9361_data_0, and set properties
@@ -185,15 +182,10 @@ if {$::board == "VC707"} {
 	apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {Master "/microblaze_0 (Periph)" Clk "Auto" }  [get_bd_intf_pins fmcomms2_spi/AXI_LITE]
 
 	#ad9361_dma automations
-	apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {Master "/microblaze_0 (Periph)" Clk "Auto" }  [get_bd_intf_pins dac_dma/S_AXI_LITE]
-	apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {Slave "/mig_7series_0/S_AXI" Clk "Auto" }  [get_bd_intf_pins dac_dma/M_AXI_MM2S]
-	apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {Slave "/mig_7series_0/S_AXI" Clk "Auto" }  [get_bd_intf_pins dac_dma/M_AXI_S2MM]
-	apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {Slave "/mig_7series_0/S_AXI" Clk "Auto" }  [get_bd_intf_pins dac_dma/M_AXI_SG]
-
-	apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {Master "/microblaze_0 (Periph)" Clk "Auto" }  [get_bd_intf_pins adc_dma/S_AXI_LITE]
-	apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {Slave "/mig_7series_0/S_AXI" Clk "Auto" }  [get_bd_intf_pins adc_dma/M_AXI_MM2S]
-	apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {Slave "/mig_7series_0/S_AXI" Clk "Auto" }  [get_bd_intf_pins adc_dma/M_AXI_S2MM]
-	apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {Slave "/mig_7series_0/S_AXI" Clk "Auto" }  [get_bd_intf_pins adc_dma/M_AXI_SG]
+	apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {Master "/microblaze_0 (Periph)" Clk "Auto" }  [get_bd_intf_pins ad9361_dma/S_AXI_LITE]
+	apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {Slave "/mig_7series_0/S_AXI" Clk "Auto" }  [get_bd_intf_pins ad9361_dma/M_AXI_MM2S]
+	apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {Slave "/mig_7series_0/S_AXI" Clk "Auto" }  [get_bd_intf_pins ad9361_dma/M_AXI_S2MM]
+	apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {Slave "/mig_7series_0/S_AXI" Clk "Auto" }  [get_bd_intf_pins ad9361_dma/M_AXI_SG]
 
 
 
@@ -335,16 +327,16 @@ if {$::ad9361_mode == "NO_DATA"} {
 	connect_bd_net -net [get_bd_nets axi_ad9361_0_l_clk] [get_bd_pins ad9361_data_0/adClk] [get_bd_pins axi_ad9361_0/l_clk]
 
 	#dma_ports
-	connect_bd_net [get_bd_pins dac_dma/m_axis_mm2s_tvalid] [get_bd_pins ad9361_data_0/dac_dma_iq_tvalid]
-	connect_bd_net [get_bd_pins dac_dma/m_axis_mm2s_tdata] [get_bd_pins ad9361_data_0/dac_dma_iq_tdata]
-	connect_bd_net [get_bd_pins ad9361_data_0/dac_dma_iq_tready] [get_bd_pins dac_dma/m_axis_mm2s_tready]
+	connect_bd_net [get_bd_pins ad9361_dma/m_axis_mm2s_tvalid] [get_bd_pins ad9361_data_0/dac_dma_iq_tvalid]
+	connect_bd_net [get_bd_pins ad9361_dma/m_axis_mm2s_tdata] [get_bd_pins ad9361_data_0/dac_dma_iq_tdata]
+	connect_bd_net [get_bd_pins ad9361_data_0/dac_dma_iq_tready] [get_bd_pins ad9361_dma/m_axis_mm2s_tready]
 
-	connect_bd_net [get_bd_pins adc_dma/s_axis_s2mm_tdata] [get_bd_pins ad9361_data_0/adc_dma_iq_tdata]
-	connect_bd_net [get_bd_pins ad9361_data_0/adc_dma_iq_tvalid] [get_bd_pins adc_dma/s_axis_s2mm_tvalid]
-	connect_bd_net [get_bd_pins adc_dma/s_axis_s2mm_tready] [get_bd_pins ad9361_data_0/adc_dma_iq_tready]
+	connect_bd_net [get_bd_pins ad9361_dma/s_axis_s2mm_tdata] [get_bd_pins ad9361_data_0/adc_dma_iq_tdata]
+	connect_bd_net [get_bd_pins ad9361_data_0/adc_dma_iq_tvalid] [get_bd_pins ad9361_dma/s_axis_s2mm_tvalid]
+	connect_bd_net [get_bd_pins ad9361_dma/s_axis_s2mm_tready] [get_bd_pins ad9361_data_0/adc_dma_iq_tready]
 
-	connect_bd_net [get_bd_pins dac_dma/mm2s_introut] [get_bd_pins microblaze_0_xlconcat/In3]
-	connect_bd_net [get_bd_pins dac_dma/s2mm_introut] [get_bd_pins microblaze_0_xlconcat/In4]
+	connect_bd_net [get_bd_pins ad9361_dma/mm2s_introut] [get_bd_pins microblaze_0_xlconcat/In3]
+	connect_bd_net [get_bd_pins ad9361_dma/s2mm_introut] [get_bd_pins microblaze_0_xlconcat/In4]
 }
 
 
