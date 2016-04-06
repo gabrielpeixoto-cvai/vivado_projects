@@ -54,23 +54,23 @@
 #undef LOAD_TX_WAVEFORM
 
 // Include the desired waveform
-#ifdef LOAD_TX_WAVEFORM
-#if LTE_MODE == LTE5
+//#ifdef LOAD_TX_WAVEFORM
+//#if LTE_MODE == LTE5
 #include "waveforms/lte_5Mhz.h"
-#else
-#include "waveforms/txWaveform.h"
-#endif
-#endif
+//#else
+//#include "waveforms/txWaveform.h"
+//#endif
+//#endif
 
-#if ROE_CPRI_SRC == ROE_SRC_DMA
-#define DMA_TX_INTR_ID        XPAR_MICROBLAZE_0_AXI_INTC_AXI_DMA_0_MM2S_INTROUT_INTR
-#endif
+//#if ROE_CPRI_SRC == ROE_SRC_DMA
+#define DMA_TX_INTR_ID        XPAR_MICROBLAZE_0_AXI_INTC_DAC_DMA_MM2S_INTROUT_INTR//XPAR_MICROBLAZE_0_AXI_INTC_AXI_DMA_0_MM2S_INTROUT_INTR
+//#endif
 
-#if ROE_CPRI_SINK == ROE_SINK_DMA
-#define DMA_RX_INTR_ID        XPAR_MICROBLAZE_0_AXI_INTC_AXI_DMA_0_S2MM_INTROUT_INTR
-#endif
+//#if ROE_CPRI_SINK == ROE_SINK_DMA
+//#define DMA_RX_INTR_ID        XPAR_MICROBLAZE_0_AXI_INTC_AXI_DMA_0_S2MM_INTROUT_INTR
+//#endif
 
-#define DMA_DEV_ID		XPAR_AXIDMA_0_DEVICE_ID
+#define DMA_DEV_ID		XPAR_DAC_DMA_DEVICE_ID//XPAR_AXIDMA_0_DEVICE_ID
 #define DDR_BASE_ADDR	XPAR_MIG7SERIES_0_BASEADDR
 
 /*
@@ -106,11 +106,11 @@
  * (valid only for the regular transmission mode and when random data is
  * generated, instead of read from an external header)
  */
-#ifndef LOAD_TX_WAVEFORM
+//#ifndef LOAD_TX_WAVEFORM
 #define N_IQ_SAMPLES		    375 * 2048
-#else
-#define N_IQ_SAMPLES N_TX_IQ_SAMPLES
-#endif
+//#else
+//#define N_IQ_SAMPLES N_TX_IQ_SAMPLES
+//#endif
 
 /*
  * Number of IQ samples processed per DMA read transaction.
@@ -119,11 +119,11 @@
  * repeated. If a preset (external) transmit waveform is used, it has to define
  * "N_TX_IQ_SAMPLES" as the number of samples in the preset array.
  */
-#ifndef LOAD_TX_WAVEFORM
+//#ifndef LOAD_TX_WAVEFORM
 #define N_IQs_PER_DMA_READ		75 * 2048
-#else
-#define N_IQs_PER_DMA_READ		N_TX_IQ_SAMPLES
-#endif
+//#else
+//#define N_IQs_PER_DMA_READ		N_TX_IQ_SAMPLES
+//#endif
 // DMA Engine requires the number of bytes (4 per IQ sample):
 #define BYTES_PER_DMA_READ		N_IQs_PER_DMA_READ * 4
 
@@ -226,20 +226,20 @@ int initAXIDma(void) {
 	}
 #endif
 
-#if ROE_CPRI_SINK == ROE_SINK_DMA
-	Status = RxSetup(&AxiDma);
-	if (Status != XST_SUCCESS) {
-
-		xil_printf("Failed RX setup\r\n");
-		return XST_FAILURE;
-	}
-	if (Config->HasS2Mm) {
-		if (SetUpInterruptSystem(DMA_RX_INTR_ID,
-						(XInterruptHandler) RxIntrHandler,
-						(void *) &AxiDma) != XST_SUCCESS)
-		return XST_FAILURE;
-	}
-#endif
+//#if ROE_CPRI_SINK == ROE_SINK_DMA
+//	Status = RxSetup(&AxiDma);
+//	if (Status != XST_SUCCESS) {
+//
+//		xil_printf("Failed RX setup\r\n");
+//		return XST_FAILURE;
+//	}
+//	if (Config->HasS2Mm) {
+//		if (SetUpInterruptSystem(DMA_RX_INTR_ID,
+//						(XInterruptHandler) RxIntrHandler,
+//						(void *) &AxiDma) != XST_SUCCESS)
+//		return XST_FAILURE;
+//	}
+//#endif
 
 	/* Disable all interrupts before setup */
 	XAxiDma_IntrDisable(&AxiDma, XAXIDMA_IRQ_ALL_MASK, XAXIDMA_DMA_TO_DEVICE);
