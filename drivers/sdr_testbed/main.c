@@ -60,7 +60,7 @@
  */
 //#if RRU_MODE
 //char AxiEthernetMAC[6] = {0xA0, 0xA1, 0xA2, 0xA3, 0xA4, 0xA5};
-//char destMAC[6] = {0xB0, 0xB1, 0xB2, 0xB3, 0xB4, 0xB5};
+//char destMAXPAR_MICROBLAZE_0_AXI_INTC_DAC_DMA_MM2S_INTROUT_INTRC[6] = {0xB0, 0xB1, 0xB2, 0xB3, 0xB4, 0xB5};
 //#else
 //char AxiEthernetMAC[6] = { 0xB0, 0xB1, 0xB2, 0xB3, 0xB4, 0xB5 };
 //char destMAC[6] = { 0xA0, 0xA1, 0xA2, 0xA3, 0xA4, 0xA5 };
@@ -200,7 +200,7 @@ int main(void) {
 //	enableInterrupt(XPAR_INTC_0_AXIETHERNET_0_AV_INTERRUPT_10MS_VEC_ID);
 //#endif
 
-#endif
+//#endif
 
 //#if ROE_CPRI_SRC == ROE_SRC_DMA || ROE_CPRI_SINK == ROE_SINK_DMA
 	Status = initAXIDma();
