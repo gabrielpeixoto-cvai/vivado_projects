@@ -31,6 +31,7 @@ apply_board_connection -board_interface "ddr3_sdram" -ip_intf "mig_7series_0/mig
 # AXI Uartlite
 create_bd_cell -type ip -vlnv xilinx.com:ip:axi_uartlite:2.0 axi_uartlite_0
 apply_board_connection -board_interface "rs232_uart" -ip_intf "axi_uartlite_0/UART" -diagram "block_design"
+set_property -dict [list CONFIG.C_BAUDRATE {9600}] [get_bd_cells axi_uartlite_0]
 
 # AXI Timer
 #create_bd_cell -type ip -vlnv xilinx.com:ip:axi_timer:2.0 axi_timer_0
