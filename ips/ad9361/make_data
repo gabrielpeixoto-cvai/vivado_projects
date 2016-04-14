@@ -1,0 +1,42 @@
+####################################################################################
+####################################################################################
+# Generate the AD 9361 data interface IP
+####################################################################################
+####################################################################################
+
+M_DEPS := ad9361_data.tcl
+M_DEPS += src/dac-dma-interface.vhd
+M_DEPS += src/dac-interface.vhd
+M_DEPS += src/adc-dma-interface.vhd
+M_DEPS += src/adc-interface.vhd
+M_DEPS += src/ad9361data_top.vhd
+
+M_VIVADO := vivado -mode batch -source
+
+M_FLIST := *.cache
+M_FLIST += *.data
+M_FLIST += *.xpr
+M_FLIST += *.log
+M_FLIST += component.xml
+M_FLIST += *.jou
+M_FLIST +=  xgui
+M_FLIST += .Xil
+
+
+.PHONY: all clean clean-all
+all: ad9361_data.xpr
+
+
+clean:clean-all
+
+
+clean-all:
+	rm -rf $(M_FLIST)
+
+
+ad9361_data.xpr: $(M_DEPS)
+	rm -rf $(M_FLIST)
+	$(M_VIVADO) ad9361_data.tcl  >> ad9361_data.log 2>&1
+
+####################################################################################
+####################################################################################
