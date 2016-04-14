@@ -129,7 +129,7 @@ architecture Behavioral of dacInterface is
 
 	-- Flags controlled by the "occupancy controller"
 	signal iq_fifo_rd_enable : std_logic;
-	signal full_panic_flag : std_logic;
+	--signal full_panic_flag : std_logic;
 
 begin
 

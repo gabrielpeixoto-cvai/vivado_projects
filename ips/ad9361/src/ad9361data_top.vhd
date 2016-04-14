@@ -308,7 +308,7 @@ begin
 	dac_if : dacInterface
 		port map(
 			dacClk => clk_fs,
-			ethClk => axiClk,
+			ethClk => clk_fs,--axiClk,
 			rst => rst,
 			-- AXIS Input
 			-- AxC 0
