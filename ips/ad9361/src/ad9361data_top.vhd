@@ -165,28 +165,28 @@ architecture Behavioral of ad9361_data is
 
 	end component;
 
-	component adc_dmaInterface is
-		generic(
-			n_axc : integer := 2;
-			compression_ratio  : integer := 1;
-			dma_read_data_type : string  := "raw"
-		);
-		port(
-			-- Defaults
-			clk_fs : in std_logic;
-			clk_axi : in std_logic;
-			rst : in std_logic;
-			-- DMA AXIS Input
-			s_axis_adc_tvalid : in std_logic;
-			s_axis_adc_tready : in  std_logic;
-			s_axis_adc_tdata  : in std_logic_vector(31 downto 0);
+	--component adc_dmaInterface is
+	--	generic(
+	--		n_axc : integer := 2;
+	--		compression_ratio  : integer := 1;
+	--		dma_read_data_type : string  := "raw"
+	--	);
+	--	port(
+	--		-- Defaults
+	--		clk_fs : in std_logic;
+	--		clk_axi : in std_logic;
+	--		rst : in std_logic;
+	--		-- DMA AXIS Input
+	--		s_axis_adc_tvalid : in std_logic;
+	--		s_axis_adc_tready : in  std_logic;
+	--		s_axis_adc_tdata  : in std_logic_vector(31 downto 0);
 
-			-- Input of IQ samples through AXIS bus
-			m_axis_dma_tready : in std_logic;
-			m_axis_dma_tvalid : out std_logic;
-			m_axis_dma_tdata  : out std_logic_vector(31 downto 0)
-		);
-	end component;
+	--		-- Input of IQ samples through AXIS bus
+	--		m_axis_dma_tready : in std_logic;
+	--		m_axis_dma_tvalid : out std_logic;
+	--		m_axis_dma_tdata  : out std_logic_vector(31 downto 0)
+	--	);
+	--end component;
 
 	--signals
 	--dac signals
@@ -346,22 +346,22 @@ begin
 
 		);
 
-		dma_adc : adc_dmaInterface
-			port map(
-				-- Defaults
-				clk_fs => clk_fs,
-				clk_axi => axiClk,
-				rst => rst,
-				-- ADC Input
-				s_axis_adc_tvalid => sig_adc_dma_iq_tvalid,
-				s_axis_adc_tready => sig_adc_dma_iq_tready,
-				s_axis_adc_tdata  => sig_adc_dma_iq_tdata,
-
-				-- Output DMA
-				m_axis_dma_tready => adc_dma_iq_tready,
-				m_axis_dma_tvalid => adc_dma_iq_tvalid,
-				m_axis_dma_tdata  => adc_dma_iq_tdata
-			);
+--		dma_adc : adc_dmaInterface
+--			port map(
+--				-- Defaults
+--				clk_fs => clk_fs,
+--				clk_axi => axiClk,
+--				rst => rst,
+--				-- ADC Input
+--				s_axis_adc_tvalid => sig_adc_dma_iq_tvalid,
+--				s_axis_adc_tready => sig_adc_dma_iq_tready,
+--				s_axis_adc_tdata  => sig_adc_dma_iq_tdata,
+--
+--				-- Output DMA
+--				m_axis_dma_tready => adc_dma_iq_tready,
+--				m_axis_dma_tvalid => adc_dma_iq_tvalid,
+--				m_axis_dma_tdata  => adc_dma_iq_tdata
+--			);
 
 		adc_if : adcInterface
 			port map(
@@ -384,9 +384,9 @@ begin
 				rx_q1_data   => adc_q1_data,
 
 				-- Outuput of IQ samples through AXIS bus
-				m_axis_iq_tready => sig_adc_dma_iq_tready,
-				m_axis_iq_tvalid => sig_adc_dma_iq_tvalid,
-				m_axis_iq_tdata  => sig_adc_dma_iq_tdata
+				m_axis_iq_tready => adc_dma_iq_tready,
+				m_axis_iq_tvalid => adc_dma_iq_tvalid,
+				m_axis_iq_tdata  => adc_dma_iq_tdata
 
 			);
 
