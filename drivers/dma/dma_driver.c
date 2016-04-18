@@ -120,9 +120,9 @@
  * "N_TX_IQ_SAMPLES" as the number of samples in the preset array.
  */
 //#ifndef LOAD_TX_WAVEFORM
-#define N_IQs_PER_DMA_READ		75 * 2048
+//#define N_IQs_PER_DMA_READ		75 * 2048
 //#else
-//#define N_IQs_PER_DMA_READ		N_TX_IQ_SAMPLES
+#define N_IQs_PER_DMA_READ		N_TX_IQ_SAMPLES
 //#endif
 // DMA Engine requires the number of bytes (4 per IQ sample):
 #define BYTES_PER_DMA_READ		N_IQs_PER_DMA_READ * 4
