@@ -310,19 +310,19 @@ begin
 
 	m_axis_i0_tdata <= sig_fifo_stage2_AxC0_tdata(15 downto 0);
 	m_axis_i0_tvalid <= sig_fifo_stage2_AxC0_tvalid;
-	--m_axis_i0_tready <= sig_fifo_stage2_Axc0_tready;
+
 
 	m_axis_q0_tdata <= sig_fifo_stage2_AxC0_tdata(31 downto 16);
 	m_axis_q0_tvalid <= sig_fifo_stage2_AxC0_tvalid;
-	--m_axis_q0_tready <= sig_fifo_stage2_Axc0_tready;
+
 
 	m_axis_i1_tdata <= sig_fifo_stage2_AxC1_tdata(15 downto 0);
 	m_axis_i1_tvalid <= sig_fifo_stage2_AxC1_tvalid;
-	--m_axis_i1_tready <= sig_fifo_stage2_Axc0_tready;
+
 
 	m_axis_q1_tdata <= sig_fifo_stage2_AxC1_tdata(31 downto 16);
 	m_axis_q1_tvalid <= sig_fifo_stage2_AxC1_tvalid;
-	--m_axis_q1_tready <= sig_fifo_stage2_Axc0_tready;
+	
 
 
 	-- Recognize a reception transaction from the DMA
@@ -436,7 +436,7 @@ begin
 		s_axis_tready => sig_demux_AxC0_tready,
 		s_axis_tdata => sig_demux_AxC0_tdata,
 		m_axis_tvalid => sig_fifo_stage1_AxC0_tvalid,
-		m_axis_tready => m_axis_i0_tready and m_axis_q0_tready,--sig_fifo_stage1_AxC0_tready,
+		m_axis_tready => sig_fifo_stage1_AxC0_tready,
 		m_axis_tdata => sig_fifo_stage1_AxC0_tdata,
 		axis_overflow => open,
 		axis_underflow => open
@@ -450,7 +450,7 @@ begin
 		s_axis_tvalid => sig_fifo_stage1_AxC0_tvalid,
 		s_axis_tready => sig_fifo_stage1_AxC0_tready,
 		s_axis_tdata => sig_fifo_stage1_AxC0_tdata,
-		m_axis_tvalid => sig_fifo_stage2_AxC0_tvalid,
+		m_axis_tvalid => open,--sig_fifo_stage2_AxC0_tvalid,
 		m_axis_tready => sig_fifo_stage2_AxC0_tready,
 		m_axis_tdata => sig_fifo_stage2_AxC0_tdata,
 		axis_overflow => open,
@@ -485,7 +485,7 @@ begin
 		s_axis_tvalid => sig_fifo_stage1_AxC1_tvalid,
 		s_axis_tready => sig_fifo_stage1_AxC1_tready,
 		s_axis_tdata => sig_fifo_stage1_AxC1_tdata,
-		m_axis_tvalid => sig_fifo_stage2_AxC1_tvalid,
+		m_axis_tvalid => open,--sig_fifo_stage2_AxC1_tvalid,
 		m_axis_tready => sig_fifo_stage2_AxC1_tready,
 		m_axis_tdata => sig_fifo_stage2_AxC1_tdata,
 		axis_overflow => open,
