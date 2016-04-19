@@ -7,3 +7,6 @@ projects/*.log
 
 ips/*.jou
 ips/*.log
+
+.Xil/
+*.debug
