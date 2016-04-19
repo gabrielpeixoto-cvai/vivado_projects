@@ -30,8 +30,8 @@ add_files -norecurse $origin_dir/src/ad9361data_top.vhd
 add_files -norecurse $origin_dir/src/dac-interface.vhd
 add_files -norecurse $origin_dir/src/adc-interface.vhd
 add_files -norecurse $origin_dir/src/dac-dma-interface.vhd
-add_files -norecurse $origin_dir/src/adc-dma-interface.vhd
-add_files -norecurse $origin_dir/src/axis_mux.vhd
+#add_files -norecurse $origin_dir/src/adc-dma-interface.vhd
+#add_files -norecurse $origin_dir/src/axis_mux.vhd
 add_files -norecurse $origin_dir/src/stream_demux.vhd
 
 ######################################################
