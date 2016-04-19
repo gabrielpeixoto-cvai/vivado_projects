@@ -1,0 +1,9 @@
+*.jou
+*.log
+*.zip
+*.str
+projects/*.jou
+projects/*.log
+
+ips/*.jou
+ips/*.log
