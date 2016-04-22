@@ -37,7 +37,7 @@ use IEEE.NUMERIC_STD.ALL;
 entity dacInterface is
 	port(
 		dacClk : in std_logic;
-		ethClk : in std_logic;
+		axiClk : in std_logic;
 		rst : in std_logic;
 		-- AXIS Input Commuter
 		-- AxC 0
@@ -129,7 +129,7 @@ begin
 	fifo_i0_i : native_fifo_8192x16
 	PORT MAP (
 		rst => rst,
-		wr_clk => ethClk,
+		wr_clk => axiClk,
 		rd_clk => dacClk,
 
 		wr_data_count  => i0_fifo_occ,
@@ -149,7 +149,7 @@ begin
 	fifo_q0_i : native_fifo_8192x16
 	PORT MAP (
 		rst => rst,
-		wr_clk => ethClk,
+		wr_clk => axiClk,
 		rd_clk => dacClk,
 
 		wr_data_count  => open,
@@ -173,7 +173,7 @@ begin
 	fifo_i1_i : native_fifo_8192x16
 	PORT MAP (
 		rst => rst,
-		wr_clk => ethClk,
+		wr_clk => axiClk,
 		rd_clk => dacClk,
 
 		wr_data_count  => open,
@@ -193,7 +193,7 @@ begin
 	fifo_q1_i : native_fifo_8192x16
 	PORT MAP (
 		rst => rst,
-		wr_clk => ethClk,
+		wr_clk => axiClk,
 		rd_clk => dacClk,
 
 		wr_data_count  => open,
