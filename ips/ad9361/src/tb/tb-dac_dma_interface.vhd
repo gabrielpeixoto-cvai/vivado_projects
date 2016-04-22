@@ -123,7 +123,7 @@ begin
 				q0 := q0 + 2;
 				sig_dma_valid <= '1';
 				sig_dma_data(31 downto 16)  <=  std_logic_vector(to_unsigned(i0, 16));
-				sig_dma_data(15 downto 0)  <=  std_logic_vector(to_unsigned(i0, 16));
+				sig_dma_data(15 downto 0)  <=  std_logic_vector(to_unsigned(q0, 16));
 				wait for dac_clk_period;
 			end loop;
 			sig_dma_valid <= '0';
