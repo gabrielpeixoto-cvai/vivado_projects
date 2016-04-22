@@ -32,4 +32,4 @@ set_property -dict [list CONFIG.Fifo_Implementation {Independent_Clocks_Block_RA
   CONFIG.Read_Data_Count_Width {13}\
   CONFIG.Full_Threshold_Assert_Value {8189}\
   CONFIG.Full_Threshold_Negate_Value {8188}] [get_ips native_fifo_8192x16]
-generate_target {instantiation_template} [get_files $origin_dir/$ip_name/$ip_name.srcs/sources_1/ip/native_fifo_8192x16/native_fifo_8192x16.xci]
+generate_target {instantiation_template} [get_files $origin_dir/$proj_name/$proj_name.srcs/sources_1/ip/native_fifo_8192x16/native_fifo_8192x16.xci]

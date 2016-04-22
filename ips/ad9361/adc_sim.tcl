@@ -34,7 +34,7 @@ set_property -dict [list\
   CONFIG.Full_Threshold_Assert_Value {125}\
   CONFIG.Full_Threshold_Negate_Value {124}\
 ] [get_ips adc_interface_fifo]
-generate_target {instantiation_template} [get_files $origin_dir/$ip_name/$ip_name.srcs/sources_1/ip/adc_interface_fifo/adc_interface_fifo.xci]
+generate_target {instantiation_template} [get_files $origin_dir/$proj_name/$proj_name.srcs/sources_1/ip/adc_interface_fifo/adc_interface_fifo.xci]
 
 
 update_compile_order -fileset sources_1

@@ -47,7 +47,7 @@ set_property -dict [list CONFIG.INTERFACE_TYPE {AXI_STREAM} \
   CONFIG.Full_Threshold_Assert_Value_axis {63} \
   CONFIG.Empty_Threshold_Assert_Value_axis {61}
 ] [get_ips fifo_axis_m_d64_w32_s_w32]
-generate_target {instantiation_template} [get_files $origin_dir/$ip_name/$ip_name.srcs/sources_1/ip/fifo_axis_m_d64_w32_s_w32/fifo_axis_m_d64_w32_s_w32.xci]
+generate_target {instantiation_template} [get_files $origin_dir/$proj_name/$proj_name.srcs/sources_1/ip/fifo_axis_m_d64_w32_s_w32/fifo_axis_m_d64_w32_s_w32.xci]
 
 update_compile_order -fileset sources_1
 update_compile_order -fileset sim_1
