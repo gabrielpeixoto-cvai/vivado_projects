@@ -69,7 +69,7 @@ architecture Behavioral of ad9361_data is
 	component dacInterface is
 		port(
 			dacClk : in std_logic;
-			ethClk : in std_logic;
+			axiClk : in std_logic;
 			rst : in std_logic;
 			-- AXIS Input
 			-- AxC 0
@@ -308,7 +308,7 @@ begin
 	dac_if : dacInterface
 		port map(
 			dacClk => clk_fs,
-			ethClk => clk_fs,--axiClk,
+			axiClk => clk_fs,--axiClk,
 			rst => rst,
 			-- AXIS Input
 			-- AxC 0
