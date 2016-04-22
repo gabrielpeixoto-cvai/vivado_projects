@@ -98,11 +98,6 @@ library UNISIM;
 use UNISIM.VComponents.all;
 
 entity dac_dmaInterface is
-	generic(
-		n_axc : integer := 2;
-		compression_ratio  : integer := 0;
-		dma_read_data_type : string  := "raw"
-	);
 	port(
 		-- Defaults
 		clk_fs : in std_logic;
@@ -134,38 +129,6 @@ entity dac_dmaInterface is
 end dac_dmaInterface;
 
 architecture Behavioral of dac_dmaInterface is
-
-	--component axis_mux is
-	--generic(
-	--	DATA_WIDTH : integer := 32
-	--);
-	--port (
-	--	clk : in std_logic;
-	--	aresetn : in std_logic;
-	--	-- Selector
-	--	selector: in std_logic_vector(1 downto 0);
-	--	-- Receive Stream 0
-	--	s_axis_rx0_tready   : out std_logic;
-	--	s_axis_rx0_tdata    : in  std_logic_vector (DATA_WIDTH-1 downto 0);
-	--	s_axis_rx0_tvalid   : in  std_logic;
-	--	-- Receive Stream 1
-	--	s_axis_rx1_tready   : out std_logic;
-	--	s_axis_rx1_tdata    : in  std_logic_vector (DATA_WIDTH-1 downto 0);
-	--	s_axis_rx1_tvalid   : in  std_logic;
-	--	-- Receive Stream 2
-	--	s_axis_rx2_tready   : out std_logic;
-	--	s_axis_rx2_tdata    : in  std_logic_vector (DATA_WIDTH-1 downto 0);
-	--	s_axis_rx2_tvalid   : in  std_logic;
-	--	-- Receive Stream 3
-	--	s_axis_rx3_tready   : out std_logic;
-	--	s_axis_rx3_tdata    : in  std_logic_vector (DATA_WIDTH-1 downto 0);
-	--	s_axis_rx3_tvalid   : in  std_logic;
-	--	-- Transmit Stream
-	--	m_axis_tready  : in  std_logic;
-	--	m_axis_tdata   : out  std_logic_vector (DATA_WIDTH-1 downto 0);
-	--	m_axis_tvalid  : out  std_logic
-	--);
-	--end component;
 
 	component stream_demux is
 	generic(
@@ -233,7 +196,7 @@ architecture Behavioral of dac_dmaInterface is
 	END COMPONENT;
 
 	-- Constants
-	constant nReadyCntBits : integer := integer(log2(real(compression_ratio)));
+	--constant nReadyCntBits : integer := integer(log2(real(compression_ratio)));
 
 	--
 	-- Signals
@@ -271,26 +234,6 @@ architecture Behavioral of dac_dmaInterface is
 	signal used_clk : std_logic;
 begin
 
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
---	Configure the internal clocking
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-
---bufr_clk_divider: if dma_read_data_type = "compressed" generate
---	BUFR_inst : BUFR
---	generic map (
---	 BUFR_DIVIDE => integer'image(compression_ratio), -- Values: "BYPASS, 1, 2, 3, 4, 5, 6, 7, 8"
---	 SIM_DEVICE => "7SERIES"           -- Must be set to "7SERIES"
---	)
---	port map (
---	 O => used_clk, -- Clock output port
---	 CE => '1',     -- Active high, clock enable (Divided modes only)
---	 CLR => '0',    -- Active high, asynchronous clear (Divided modes only)
---	 I => clk_fs    -- Clock buffer input
---	);
---end generate;
---
 --clk_bypass: if dma_read_data_type /= "compressed" generate
 	used_clk <= clk_fs;
 --end generate;
@@ -322,7 +265,10 @@ begin
 
 	m_axis_q1_tdata <= sig_fifo_stage2_AxC1_tdata(31 downto 16);
 	m_axis_q1_tvalid <= sig_fifo_stage2_AxC1_tvalid;
-	
+
+	--sig_fifo_stage1_AxC0_tvalid<='1';
+	--sig_fifo_stage1_AxC1_tvalid<='1';
+
 
 
 	-- Recognize a reception transaction from the DMA
@@ -331,14 +277,14 @@ begin
 	--downstream_tx_transaction <= sig_m_axis_iq_tvalid and m_axis_i0_tready and m_axis_q0_tready and m_axis_i1_tready and m_axis_q1_tready;
 
 --------------------------------------------------------------------------------
--- CASE #2: 2 AxC
---
---	             ->- Interface FIFO ->- Internal FIFO ->-
---              /                                         \
--- 	Demux --->-                                            ---- Mux -> Output
---              \                                         /
---               ->- Interface FIFO ->- Internal FIFO ->-
---
+-- DAC
+--																												/|
+--	             ->- Interface FIFO ->- Internal FIFO ->-| |
+--              /                                         \|
+-- 	Demux --->-                                            |  DAC-Interface
+--              \                                         /|
+--               ->- Interface FIFO ->- Internal FIFO ->-| |
+--																												\|
 --------------------------------------------------------------------------------
 
 	demux_commutator: process(clk_axi, rst)
@@ -347,7 +293,7 @@ begin
 			demux_select <= (others => '0');
 		elsif (rising_edge(clk_axi)) then
 			if (dma_rx_transaction = '1') then
-				if (demux_select = to_unsigned(n_axc - 1, 2)) then
+				if (demux_select = to_unsigned(2 - 1, 2)) then
 					demux_select <= (others => '0');
 				else
 					demux_select <= demux_select + 1;
@@ -355,22 +301,6 @@ begin
 			end if;
 		end if;
 	end process;
-
-
-	--mux_commutator: process(clk_axi, rst)
-	--begin
-	--	if (rst = '1') then
-	--		mux_select <= (others => '0');
-	--	elsif (rising_edge(clk_axi)) then
-	--		if (downstream_tx_transaction = '1') then
-	--			if (mux_select = to_unsigned(n_axc - 1, 2)) then
-	--				mux_select <= (others => '0');
-	--			else
-	--				mux_select <= mux_select + 1;
-	--			end if;
-	--		end if;
-	--	end if;
-	--end process;
 
 	------------------------
 	-- Demultiplexer
@@ -450,7 +380,7 @@ begin
 		s_axis_tvalid => sig_fifo_stage1_AxC0_tvalid,
 		s_axis_tready => sig_fifo_stage1_AxC0_tready,
 		s_axis_tdata => sig_fifo_stage1_AxC0_tdata,
-		m_axis_tvalid => open,--sig_fifo_stage2_AxC0_tvalid,
+		m_axis_tvalid => sig_fifo_stage2_AxC0_tvalid,
 		m_axis_tready => sig_fifo_stage2_AxC0_tready,
 		m_axis_tdata => sig_fifo_stage2_AxC0_tdata,
 		axis_overflow => open,
@@ -485,7 +415,7 @@ begin
 		s_axis_tvalid => sig_fifo_stage1_AxC1_tvalid,
 		s_axis_tready => sig_fifo_stage1_AxC1_tready,
 		s_axis_tdata => sig_fifo_stage1_AxC1_tdata,
-		m_axis_tvalid => open,--sig_fifo_stage2_AxC1_tvalid,
+		m_axis_tvalid => sig_fifo_stage2_AxC1_tvalid,
 		m_axis_tready => sig_fifo_stage2_AxC1_tready,
 		m_axis_tdata => sig_fifo_stage2_AxC1_tdata,
 		axis_overflow => open,
