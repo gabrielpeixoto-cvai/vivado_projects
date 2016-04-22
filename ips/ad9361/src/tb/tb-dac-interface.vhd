@@ -19,7 +19,7 @@ architecture STRUCTURE of tb_dacInterface is
 	component dacInterface is
 	port(
 		dacClk : in std_logic;
-		ethClk : in std_logic;
+		axiClk : in std_logic;
 		rst : in std_logic;
 		-- AXIS Input
 		-- AxC 0
@@ -61,10 +61,10 @@ architecture STRUCTURE of tb_dacInterface is
 	signal rst : std_logic := '0';
 
 	-- Clock period definitions
-	constant eth_clk_period : time := 10 ns;
-	constant da_rd_clk_period : time := 130.208 ns;
-	signal eth_clk : std_logic := '0';
-	signal da_rd_clk : std_logic := '0';
+	constant axi_clk_period : time := 10 ns;
+	constant dac_clk_period : time := 130.208 ns;
+	signal axi_clk : std_logic := '0';
+	signal dac_clk : std_logic := '0';
 
 
 	-- Input AxC AXI streams
@@ -86,109 +86,91 @@ begin
 	-- Clock process definitions
 	clk_process : process
 	begin
-		da_rd_clk <= '0';
-		wait for da_rd_clk_period/2;
-		da_rd_clk <= '1';
-		wait for da_rd_clk_period/2;
+		dac_clk <= '0';
+		wait for dac_clk_period/2;
+		dac_clk <= '1';
+		wait for dac_clk_period/2;
 	end process;
 
 	eth_clk_process : process
 	begin
-		eth_clk <= '0';
-		wait for eth_clk_period/2;
-		eth_clk <= '1';
-		wait for eth_clk_period/2;
+		axi_clk <= '0';
+		wait for axi_clk_period/2;
+		axi_clk <= '1';
+		wait for axi_clk_period/2;
 	end process;
 
 	-- Generate resets
 	rst_process : process
 	begin
 		rst <= '1';
-		wait for eth_clk_period*10;
+		wait for axi_clk_period*10;
 		rst <= '0';
 		wait;
 	end process;
 
-	----------------------------------
-	-- CPRI BF Rx process
-	----------------------------------
-	-- In the cpriEthernetInterface module, the incoming Ethernet data
-	-- comes in words of 32 bit. Hence, one BF of 128 bits takes
-	-- 4 clock cycles to be buffered. Then, since one BF carries
-	-- 8 samples (4 IQ) and there are 4 queues being read by the
-	-- DAC (2 IQ channels), then it takes 2 DAC clock cycles to
-	-- read a BF.
-	-- Based on these values, one Ethernet packet with 64 BFs
-	-- takes 2*64 CPRI clock cycles to be procesed (buffered).
-	-- For a CPRI clock of 7.68MHz (period of 0.1302 us), this
-	-- corresponds to 16.6667us
-	--cpri_bf_rx_process:  process
-	--	variable i0 : integer := 0;
-	--	variable i1 : integer := 0;
-	--	variable q0 : integer := 0;
-	--	variable q1 : integer := 0;
-	--begin
-	--	cpri_wr_en <= '0';
-	--	wait for 5 us;
-	--	while true loop
-	--		for j in 0 to 2 loop -- alternating Eth packet period
-	--			if (j = 0) then
-	--				wait for (16.66 - 2.56)*1 us;
-	--			else
-	--				wait for (16.67 - 2.56)*1 us;
-	--			end if;
-	--			-- Align with clock
-	--			wait until rising_edge(eth_clk);
-	--			-- Buffer the 64 BFs contained in the Eth packet
-	--			for i in 0 to 63 loop
-	--				-- First IQ samples for each AxC
-	--				sig_axis_axc0_tdata <= std_logic_vector(to_unsigned(i0, 15)) & '0' & std_logic_vector(to_unsigned(q0, 15)) & '0';
-	--				sig_axis_axc1_tdata <= std_logic_vector(to_unsigned(i1, 15)) & '0' & std_logic_vector(to_unsigned(q1, 15)) & '0';
-	--				sig_axis_axc0_tvalid <= '1';
-	--				sig_axis_axc1_tvalid <= '1';
-	--				-- Enable buffering only at the 4th clock cycle
-	--				-- which is the time necessary to aquire 128 bits via
-	--				-- the Ethernet interface
-	--				wait for eth_clk_period;
-	--				-- Second IQ samples for each AxC
-	--				sig_axis_axc0_tdata <= std_logic_vector(to_unsigned(i0+1, 15)) & '0' & std_logic_vector(to_unsigned(q0+1, 15)) & '0';
-	--				sig_axis_axc1_tdata <= std_logic_vector(to_unsigned(i1+1, 15)) & '0' & std_logic_vector(to_unsigned(q1+1, 15)) & '0';
-	--				sig_axis_axc0_tvalid <= '1';
-	--				sig_axis_axc1_tvalid <= '1';
-	--				-- Increment
-	--				i0 := i0 + 2;
-	--				i1 := i1 + 2;
-	--				q0 := q0 + 2;
-	--				q1 := q1 + 2;
-	--				wait for eth_clk_period;
-	--				sig_axis_axc0_tdata  <= (others=>'0');
-	--				sig_axis_axc1_tdata  <= (others=>'0');
-	--				sig_axis_axc0_tvalid <= '0';
-	--				sig_axis_axc1_tvalid <= '0';
-	--				wait for 2*eth_clk_period;
-	--			end loop;
-	--			cpri_wr_en <= '0';
-	--			cpri_bf_in <= (others=>'0');
-	--		end loop;
-	--	end loop;
-	--end process;
+	dac_read_process:  process
+		variable i0 : integer := 0;
+		variable i1 : integer := 1;
+		variable q0 : integer := 2;
+		variable q1 : integer := 3;
+	begin
+		sig_axis_axc0_itvalid <= '0';
+		sig_axis_axc0_itdata  <=  (others => '0');
+		sig_axis_axc0_qtvalid <= '0';
+		sig_axis_axc0_qtdata  <=  (others => '0');
+		sig_axis_axc1_itvalid <= '0';
+		sig_axis_axc1_itdata  <=  (others => '0');
+		sig_axis_axc1_qtvalid <= '0';
+		sig_axis_axc1_qtdata  <=  (others => '0');
+		wait for 1 us;
+		while true loop
+			-- Align with clock
+			wait until rising_edge(dac_clk);
+			-- Simulate samples acquired by the ADC
+			for i in 0 to 63 loop
+				-- Increment
+				i0 := i0 + 1;
+				i1 := i1 + 2;
+				q0 := q0 + 3;
+				q1 := q1 + 4;
+				sig_axis_axc0_itvalid <= '1';
+				sig_axis_axc0_itdata  <=  std_logic_vector(to_unsigned(i0, 16));
+				sig_axis_axc0_qtvalid <= '1';
+				sig_axis_axc0_qtdata  <=  std_logic_vector(to_unsigned(q0, 16));
+				sig_axis_axc1_itvalid <= '1';
+				sig_axis_axc1_itdata  <=  std_logic_vector(to_unsigned(i1, 16));
+				sig_axis_axc1_qtvalid <= '1';
+				sig_axis_axc1_qtdata  <=  std_logic_vector(to_unsigned(q1, 16));
+				wait for dac_clk_period;
+			end loop;
+			sig_axis_axc0_itvalid <= '0';
+			sig_axis_axc0_itdata  <=  (others => '0');
+			sig_axis_axc0_qtvalid <= '0';
+			sig_axis_axc0_qtdata  <=  (others => '0');
+			sig_axis_axc1_itvalid <= '0';
+			sig_axis_axc1_itdata  <=  (others => '0');
+			sig_axis_axc1_qtvalid <= '0';
+			sig_axis_axc1_qtdata  <=  (others => '0');
+		end loop;
+	end process;
 
-	sig_axis_axc0_itvalid	<= '1';
-	sig_axis_axc0_qtvalid	<= '1';
-	sig_axis_axc1_itvalid	<= '1';
-	sig_axis_axc1_qtvalid	<= '1';
+	--sig_axis_axc0_itvalid	<= '1';
+	--sig_axis_axc0_qtvalid	<= '1';
+	--sig_axis_axc1_itvalid	<= '1';
+	--sig_axis_axc1_qtvalid	<= '1';
 
-	sig_axis_axc0_itdata <= "1111111111111111";
-	sig_axis_axc0_qtdata <= "0000000000000000";
-	sig_axis_axc1_itdata <= "1111111111111111";
-	sig_axis_axc1_qtdata <= "0000000000000000";
+	--sig_axis_axc0_itdata <= "1111111111111111";
+	--sig_axis_axc0_qtdata <= "0000000000000000";
+	--sig_axis_axc1_itdata <= "1111111111111111";
+	--sig_axis_axc1_qtdata <= "0000000000000000";
 
 	-- TODO use cpri_rx_full for something
 	uut : dacInterface
 	port map(
 		-- Defaults
-		dacClk  => da_rd_clk,
-		ethClk  => eth_clk,
+		dacClk  => dac_clk,
+		axiClk  => axi_clk,
 		rst  => rst,
 		-- AXIS Input
 		-- AxC 0
