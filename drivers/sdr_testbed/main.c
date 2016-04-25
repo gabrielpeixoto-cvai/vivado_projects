@@ -236,12 +236,12 @@ int main(void) {
 //#endif
 //
 //#if ROE_CPRI_SRC == ROE_SRC_DMA
-//	// Fire a transmission
-//	Status = startCyclicDmaRead();
-//	if (Status != XST_SUCCESS) {
-//		xil_printf("Failed to transmit data via DMA");
-//		return XST_FAILURE;
-//	}
+	// Fire a transmission
+	Status = startCyclicDmaRead();
+	if (Status != XST_SUCCESS) {
+		xil_printf("Failed to transmit data via DMA");
+		return XST_FAILURE;
+	}
 //#else
 //	// Initialize CPRI Emulation:
 //	RoE_initCpriEmulator();
