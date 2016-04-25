@@ -293,7 +293,7 @@ begin
 			demux_select <= (others => '0');
 		elsif (rising_edge(clk_axi)) then
 			if (dma_rx_transaction = '1') then
-				if (demux_select = to_unsigned(2 - 1, 2)) then
+				if (demux_select = to_unsigned(1, 2)) then
 					demux_select <= (others => '0');
 				else
 					demux_select <= demux_select + 1;
