@@ -118,7 +118,7 @@ begin
 		else
 			case demux_selector is
 			when "00" =>
-				RXD_S_AXIS_TREADY  <= '1';
+				--RXD_S_AXIS_TREADY  <= '1';
 				RXD_M0_AXIS_TDATA  <= RXD_S_AXIS_TDATA ;
 				RXD_M0_AXIS_TLAST  <= RXD_S_AXIS_TLAST ;
 				RXD_M0_AXIS_TVALID <= RXD_S_AXIS_TVALID;
@@ -140,7 +140,7 @@ begin
 				RXD_M3_AXIS_TUSER  <= (others => '0');
 				RXD_M3_AXIS_TKEEP  <= (others => '0');
 			when "01" =>
-				RXD_S_AXIS_TREADY  <= '1';
+				--RXD_S_AXIS_TREADY  <= '1';
 				RXD_M0_AXIS_TDATA  <= (others => '0');
 				RXD_M0_AXIS_TLAST  <= '0';
 				RXD_M0_AXIS_TVALID <= '0';
@@ -162,7 +162,7 @@ begin
 				RXD_M3_AXIS_TUSER  <= (others => '0');
 				RXD_M3_AXIS_TKEEP  <= (others => '0');
 			when "10" =>
-				RXD_S_AXIS_TREADY  <= '1';
+				--RXD_S_AXIS_TREADY  <= '1';
 				RXD_M0_AXIS_TDATA  <= (others => '0');
 				RXD_M0_AXIS_TLAST  <= '0';
 				RXD_M0_AXIS_TVALID <= '0';
@@ -184,7 +184,7 @@ begin
 				RXD_M3_AXIS_TUSER  <= (others => '0');
 				RXD_M3_AXIS_TKEEP  <= (others => '0');
 			when "11" =>
-				RXD_S_AXIS_TREADY  <= '1';
+				--RXD_S_AXIS_TREADY  <= '1';
 				RXD_M0_AXIS_TDATA  <= (others => '0');
 				RXD_M0_AXIS_TLAST  <= '0';
 				RXD_M0_AXIS_TVALID <= '0';
@@ -206,7 +206,7 @@ begin
 				RXD_M3_AXIS_TUSER  <= RXD_S_AXIS_TUSER ;
 				RXD_M3_AXIS_TKEEP  <= RXD_S_AXIS_TKEEP ;
 			when others =>
-				RXD_S_AXIS_TREADY  <= '1';
+				--RXD_S_AXIS_TREADY  <= '1';
 				RXD_M0_AXIS_TDATA  <= (others => '0');
 				RXD_M0_AXIS_TLAST  <= '0';
 				RXD_M0_AXIS_TVALID <= '0';
