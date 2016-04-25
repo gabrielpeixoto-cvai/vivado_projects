@@ -221,6 +221,12 @@ begin
 	axc1_i_fifo_wr_en <= s_axis_axc1_i_tvalid; --and (not full_panic_flag);
 	axc1_q_fifo_wr_en <= s_axis_axc1_q_tvalid; --and (not full_panic_flag);
 
+	s_axis_axc0_i_tready <= tx_i0_valid and tx_i0_enable;
+	s_axis_axc0_q_tready <= tx_q0_valid and tx_q0_enable;
+	s_axis_axc1_i_tready <= tx_i1_valid and tx_i1_enable;
+	s_axis_axc1_q_tready <= tx_q1_valid and tx_q1_enable;
+
+
 
 	-- Read enable signal for the IQ FIFOs above.
 	--i0_rd_en <= iq_fifo_rd_enable and tx_i0_valid and tx_i0_enable;
