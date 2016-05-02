@@ -208,9 +208,6 @@ architecture Behavioral of dac_dmaInterface is
 	signal downstream_tx_transaction : std_logic;
 	signal sig_s_axis_dma_tready : std_logic;
 	signal sig_m_axis_iq_tvalid : std_logic;
-
-	-- Select signals for the Mux and the Demux
-	signal mux_select : unsigned(1 downto 0);
 	signal demux_select : unsigned(1 downto 0);
 
 	-- From the demux to the interface FIFO
