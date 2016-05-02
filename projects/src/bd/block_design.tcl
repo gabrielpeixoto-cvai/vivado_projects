@@ -37,14 +37,14 @@ set_property -dict [list CONFIG.C_BAUDRATE {9600}] [get_bd_cells axi_uartlite_0]
 #create_bd_cell -type ip -vlnv xilinx.com:ip:axi_timer:2.0 axi_timer_0
 
 if {$::board == "VC707"} {
-	# AXI Ethernet
-	create_bd_cell -type ip -vlnv xilinx.com:ip:axi_ethernet:7.0 axi_ethernet_0
-	# Connect the MAC to the PHY via the Serial-gigabit media-independent Interface (SGMII):
-	apply_board_connection -board_interface "sgmii" -ip_intf "axi_ethernet_0/sgmii" -diagram "block_design"
-	# Connect the PHY to the MDIO interface, through which its registers are managed
-	apply_board_connection -board_interface "mdio_mdc" -ip_intf "axi_ethernet_0/mdio" -diagram "block_design"
-	apply_board_connection -board_interface "phy_reset_out" -ip_intf "axi_ethernet_0/phy_rst_n" -diagram "block_design"
-	apply_board_connection -board_interface "sgmii_mgt_clk" -ip_intf "axi_ethernet_0/mgt_clk" -diagram "block_design"
+#	# AXI Ethernet
+#	create_bd_cell -type ip -vlnv xilinx.com:ip:axi_ethernet:7.0 axi_ethernet_0
+#	# Connect the MAC to the PHY via the Serial-gigabit media-independent Interface (SGMII):
+#	apply_board_connection -board_interface "sgmii" -ip_intf "axi_ethernet_0/sgmii" -diagram "block_design"
+#	# Connect the PHY to the MDIO interface, through which its registers are managed
+#	apply_board_connection -board_interface "mdio_mdc" -ip_intf "axi_ethernet_0/mdio" -diagram "block_design"
+#	apply_board_connection -board_interface "phy_reset_out" -ip_intf "axi_ethernet_0/phy_rst_n" -diagram "block_design"
+#	apply_board_connection -board_interface "sgmii_mgt_clk" -ip_intf "axi_ethernet_0/mgt_clk" -diagram "block_design"
 } elseif {$::board == "VC709"} {
 
 
@@ -105,7 +105,7 @@ set_property -dict [list CONFIG.C_BAUDRATE {115200}] [get_bd_cells axi_uartlite_
 set_property -dict [list CONFIG.NUM_PORTS $no_interrupts] [get_bd_cells microblaze_0_xlconcat]
 
 if {$::board == "VC707"} {
-	apply_bd_automation -rule xilinx.com:bd_rule:axi_ethernet -config {PHY_TYPE "SGMII" FIFO_DMA "DMA" }  [get_bd_cells axi_ethernet_0]
+#	apply_bd_automation -rule xilinx.com:bd_rule:axi_ethernet -config {PHY_TYPE "SGMII" FIFO_DMA "DMA" }  [get_bd_cells axi_ethernet_0]
 } elseif {$::board == "VC709"} {
 
 
@@ -136,12 +136,12 @@ apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {Master "/microblaze_0
 #apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {Master "/microblaze_0 (Periph)" Clk "Auto" }  [get_bd_intf_pins axi_timer_0/S_AXI]
 
 if {$::board == "VC707"} {
-	apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {Master "/microblaze_0 (Periph)" Clk "Auto" }  [get_bd_intf_pins axi_ethernet_0/s_axi]
-	apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {Master "/microblaze_0 (Periph)" Clk "Auto" }  [get_bd_intf_pins axi_ethernet_0_dma/S_AXI_LITE]
-	apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {Slave "/mig_7series_0/S_AXI" Clk "Auto" }  [get_bd_intf_pins axi_ethernet_0_dma/M_AXI_SG]
-	apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {Slave "/mig_7series_0/S_AXI" Clk "Auto" }  [get_bd_intf_pins axi_ethernet_0_dma/M_AXI_MM2S]
-
-	apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {Slave "/mig_7series_0/S_AXI" Clk "Auto" }  [get_bd_intf_pins axi_ethernet_0_dma/M_AXI_S2MM]
+#	apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {Master "/microblaze_0 (Periph)" Clk "Auto" }  [get_bd_intf_pins axi_ethernet_0/s_axi]
+#	apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {Master "/microblaze_0 (Periph)" Clk "Auto" }  [get_bd_intf_pins axi_ethernet_0_dma/S_AXI_LITE]
+#	apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {Slave "/mig_7series_0/S_AXI" Clk "Auto" }  [get_bd_intf_pins axi_ethernet_0_dma/M_AXI_SG]
+#	apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {Slave "/mig_7series_0/S_AXI" Clk "Auto" }  [get_bd_intf_pins axi_ethernet_0_dma/M_AXI_MM2S]
+#
+#	apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {Slave "/mig_7series_0/S_AXI" Clk "Auto" }  [get_bd_intf_pins axi_ethernet_0_dma/M_AXI_S2MM]
 } elseif {$::board == "VC709"} {
 
 
@@ -204,9 +204,9 @@ if {$::board == "VC707"} {
 # Concatenate Interrupt Signals (up to 32 can be concatenated)
 #  IPs with interrupts:
 
-connect_bd_net [get_bd_pins axi_ethernet_0_dma/mm2s_introut] [get_bd_pins microblaze_0_xlconcat/In0]
-connect_bd_net [get_bd_pins axi_ethernet_0_dma/s2mm_introut] [get_bd_pins microblaze_0_xlconcat/In1]
-connect_bd_net [get_bd_pins axi_ethernet_0/interrupt] [get_bd_pins microblaze_0_xlconcat/In2]
+#connect_bd_net [get_bd_pins axi_ethernet_0_dma/mm2s_introut] [get_bd_pins microblaze_0_xlconcat/In0]
+#connect_bd_net [get_bd_pins axi_ethernet_0_dma/s2mm_introut] [get_bd_pins microblaze_0_xlconcat/In1]
+#connect_bd_net [get_bd_pins axi_ethernet_0/interrupt] [get_bd_pins microblaze_0_xlconcat/In2]
 
 #################################################################################
 ## Other connections
@@ -363,29 +363,7 @@ if {$::ad9361_mode == "NO_DATA"} {
 
   create_bd_port -dir I -from 5 -to 0 rx_data_in_p
   connect_bd_net [get_bd_pins /axi_ad9361_0/rx_data_in_p] [get_bd_ports rx_data_in_p]
-
-  create_bd_port -dir I -from 5 -to 0 rx_data_in_n
-  connect_bd_net [get_bd_pins /axi_ad9361_0/rx_data_in_n] [get_bd_ports rx_data_in_n]
-
-  # TX interface pins
-
-  create_bd_port -dir O tx_clk_out_p
-  connect_bd_net [get_bd_pins /axi_ad9361_0/tx_clk_out_p] [get_bd_ports tx_clk_out_p]
-
-  create_bd_port -dir O tx_clk_out_n
-  connect_bd_net [get_bd_pins /axi_ad9361_0/tx_clk_out_n] [get_bd_ports tx_clk_out_n]
-
-  create_bd_port -dir O tx_frame_out_p
-  connect_bd_net [get_bd_pins /axi_ad9361_0/tx_frame_out_p] [get_bd_ports tx_frame_out_p]
-
-  create_bd_port -dir O tx_frame_out_n
-  connect_bd_net [get_bd_pins /axi_ad9361_0/tx_frame_out_n] [get_bd_ports tx_frame_out_n]
-
-  create_bd_port -dir O -from 5 -to 0 tx_data_out_p
-  connect_bd_net [get_bd_pins /axi_ad9361_0/tx_data_out_p] [get_bd_ports tx_data_out_p]
-
-  create_bd_port -dir O -from 5 -to 0 tx_data_out_n
-  connect_bd_net [get_bd_pins /axi_ad9361_0/tx_data_out_n] [get_bd_ports tx_data_out_n]
+Search commandsi_ad9361_0/tx_data_out_n] [get_bd_ports tx_data_out_n]
 
   # ENSM
   create_bd_port -dir O enable
