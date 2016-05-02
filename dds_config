@@ -1,0 +1,9 @@
+temporary changes to wrapper
+
+signal phase_increment : STD_LOGIC_VECTOR(15 downto 0);
+  signal valid : STD_LOGIC;
+  signal ready : STD_LOGIC;
+
+valid<='1';
+ready<='1';
+phase_increment <= "0010100011110110";
