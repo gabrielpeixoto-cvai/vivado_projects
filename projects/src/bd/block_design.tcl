@@ -355,7 +355,7 @@ if {$::ad9361_mode == "NO_DATA"} {
   # Rx and Tx may not be both used, by to avoid unconnected pins in the IP, connect
   # all of them.
 
-  # RX interface pins
+	# RX interface pins
 
   create_bd_port -dir I rx_clk_in_p
   connect_bd_net [get_bd_pins /axi_ad9361_0/rx_clk_in_p] [get_bd_ports rx_clk_in_p]
@@ -371,7 +371,29 @@ if {$::ad9361_mode == "NO_DATA"} {
 
   create_bd_port -dir I -from 5 -to 0 rx_data_in_p
   connect_bd_net [get_bd_pins /axi_ad9361_0/rx_data_in_p] [get_bd_ports rx_data_in_p]
-Search commandsi_ad9361_0/tx_data_out_n] [get_bd_ports tx_data_out_n]
+
+  create_bd_port -dir I -from 5 -to 0 rx_data_in_n
+  connect_bd_net [get_bd_pins /axi_ad9361_0/rx_data_in_n] [get_bd_ports rx_data_in_n]
+
+  # TX interface pins
+
+  create_bd_port -dir O tx_clk_out_p
+  connect_bd_net [get_bd_pins /axi_ad9361_0/tx_clk_out_p] [get_bd_ports tx_clk_out_p]
+
+  create_bd_port -dir O tx_clk_out_n
+  connect_bd_net [get_bd_pins /axi_ad9361_0/tx_clk_out_n] [get_bd_ports tx_clk_out_n]
+
+  create_bd_port -dir O tx_frame_out_p
+  connect_bd_net [get_bd_pins /axi_ad9361_0/tx_frame_out_p] [get_bd_ports tx_frame_out_p]
+
+  create_bd_port -dir O tx_frame_out_n
+  connect_bd_net [get_bd_pins /axi_ad9361_0/tx_frame_out_n] [get_bd_ports tx_frame_out_n]
+
+  create_bd_port -dir O -from 5 -to 0 tx_data_out_p
+  connect_bd_net [get_bd_pins /axi_ad9361_0/tx_data_out_p] [get_bd_ports tx_data_out_p]
+
+  create_bd_port -dir O -from 5 -to 0 tx_data_out_n
+  connect_bd_net [get_bd_pins /axi_ad9361_0/tx_data_out_n] [get_bd_ports tx_data_out_n]
 
   # ENSM
   create_bd_port -dir O enable
