@@ -311,7 +311,7 @@ AD9361_InitParam default_init_param = {
 		NULL	//(*ad9361_rfpll_ext_set_rate)()
 		};
 
-#if LTE_MODE==LTE5
+#if 1
 
 #define SAMPLING_FREQ  7680000
 #define RF_BW          4500000
@@ -352,7 +352,7 @@ AD9361_RXFIRConfig rx_fir_config = { 3, //rx
 		4694670 //rx_bandwidth
 		};
 #endif
-#if LTE_MODE==LTE20
+#if 0
 
 #define SAMPLING_FREQ  30720000
 #define RF_BW          18000000

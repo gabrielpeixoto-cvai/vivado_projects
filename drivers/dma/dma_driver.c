@@ -923,9 +923,11 @@ int startCyclicDmaRead() {
 	XAxiDma_Bd *BdPtr;
 	int Status;
 	u32 BufferAddr;
-#ifdef LOAD_TX_WAVEFORM
+#if 1
 	BufferAddr = (u32) &txWaveform;
-#else
+#endif
+
+#if 0
 	BufferAddr = (u32) TX_BUFFER_BASE;
 #endif
 
