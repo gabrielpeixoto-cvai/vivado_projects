@@ -256,30 +256,32 @@ begin
 -- following modules generate such a clock.
 --------------------------------------------------------------------------------
 
-	BUFR_inst : BUFR
-	generic map (
-		BUFR_DIVIDE => "4",      -- Values: "BYPASS, 1, 2, 3, 4, 5, 6, 7, 8"
-		SIM_DEVICE => "7SERIES"  -- Must be set to "7SERIES"
-	)
-	port map (
-		O => bufr_out,  -- Clock output port
-		CE => '1',    -- Active high, clock enable (Divided modes only)
-		CLR => '0',   -- Active high, asynchronous clear (Divided modes only)
-		I => adClk  -- Clock buffer input
-	);
+	--BUFR_inst : BUFR
+	--generic map (
+	--	BUFR_DIVIDE => "4",      -- Values: "BYPASS, 1, 2, 3, 4, 5, 6, 7, 8"
+	--	SIM_DEVICE => "7SERIES"  -- Must be set to "7SERIES"
+	--)
+	--port map (
+	--	O => bufr_out,  -- Clock output port
+	--	CE => '1',    -- Active high, clock enable (Divided modes only)
+	--	CLR => '0',   -- Active high, asynchronous clear (Divided modes only)
+	--	I => adClk  -- Clock buffer input
+	--);
 
-	BUFG_inst : BUFG
-	port map (
-		O => clk_fs, -- 1-bit output: Clock output
-		I => bufr_out  -- 1-bit input: Clock input
-	);
+	--BUFG_inst : BUFG
+	--port map (
+	--	O => clk_fs, -- 1-bit output: Clock output
+	--	I => bufr_out  -- 1-bit input: Clock input
+	--);
+
+
 
 --------------------------------------------------------------------------------
 
 	dma_dac : dac_dmaInterface
 		port map(
 			-- Defaults
-			clk_fs => clk_fs,
+			clk_fs => axiClk,--clk_fs,
 			clk_axi => axiClk,
 			rst => rst,
 			-- DMA AXIS Input
@@ -288,7 +290,7 @@ begin
 			s_axis_dma_tdata  => dac_dma_iq_tdata,
 
 			-- Output of IQ samples through AXIS bus
-			m_axis_i0_tready => dma_tx_i0_valid,
+			m_axis_i0_tready => dma_tx_i0_enable,
 			m_axis_i0_tvalid => dma_tx_i0_valid,
 			m_axis_i0_tdata  => dma_tx_i0_data,
 
@@ -307,8 +309,8 @@ begin
 
 	dac_if : dacInterface
 		port map(
-			dacClk => clk_fs,
-			axiClk => clk_fs,--axiClk,
+			dacClk => adClk,
+			axiClk => axiClk,
 			rst => rst,
 			-- AXIS Input
 			-- AxC 0
@@ -365,7 +367,7 @@ begin
 
 		adc_if : adcInterface
 			port map(
-				adcClk => clk_fs,
+				adcClk => adClk,
 				axiClk => axiClk,
 				rst => rst,
 
