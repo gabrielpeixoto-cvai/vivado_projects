@@ -81,8 +81,57 @@ set_property used_in_synthesis false [get_files  $origin_dir/$proj_name/$proj_na
 #
 ######################################################################
 if 0 {
+
+    set_property HDL_ATTRIBUTE.MARK_DEBUG true [get_bd_nets {ad9361_data_0_dac_dma_iq_tready }]
+
+    set_property HDL_ATTRIBUTE.MARK_DEBUG true [get_bd_nets {ad9361_data_0_adc_dma_iq_tvalid }]
+
+    set_property HDL_ATTRIBUTE.MARK_DEBUG {} [get_bd_nets {ad9361_data_0_adc_dma_iq_tvalid }]
+    set_property HDL_ATTRIBUTE.MARK_DEBUG true [get_bd_nets {ad9361_data_0_adc_dma_iq_tvalid }]
+
+    set_property HDL_ATTRIBUTE.MARK_DEBUG true [get_bd_nets {ad9361_data_0_adc_dma_iq_tdata }]
+
+    set_property HDL_ATTRIBUTE.MARK_DEBUG true [get_bd_nets {ad9361_dma_s_axis_s2mm_tready }]
+
+    set_property HDL_ATTRIBUTE.MARK_DEBUG true [get_bd_nets {ad9361_dma_m_axis_mm2s_tdata }]
+
+    set_property HDL_ATTRIBUTE.MARK_DEBUG true [get_bd_nets {ad9361_dma_m_axis_mm2s_tvalid }]
+
+    set_property HDL_ATTRIBUTE.MARK_DEBUG true [get_bd_nets {axi_ad9361_0_dac_enable_i0 }]
+
+    set_property HDL_ATTRIBUTE.MARK_DEBUG true [get_bd_nets {axi_ad9361_0_dac_valid_i0 }]
+
+    set_property HDL_ATTRIBUTE.MARK_DEBUG true [get_bd_nets {axi_ad9361_0_dac_enable_q0 }]
+
+    set_property HDL_ATTRIBUTE.MARK_DEBUG true [get_bd_nets {axi_ad9361_0_dac_valid_q0 }]
+
+    set_property HDL_ATTRIBUTE.MARK_DEBUG true [get_bd_nets {axi_ad9361_0_dac_enable_i1 }]
+
+    set_property HDL_ATTRIBUTE.MARK_DEBUG true [get_bd_nets {axi_ad9361_0_dac_valid_i1 }]
+
+    set_property HDL_ATTRIBUTE.MARK_DEBUG true [get_bd_nets {axi_ad9361_0_dac_enable_q1 }]
+
+    set_property HDL_ATTRIBUTE.MARK_DEBUG true [get_bd_nets {axi_ad9361_0_dac_valid_q1 }]
+
+    set_property HDL_ATTRIBUTE.MARK_DEBUG true [get_bd_nets {axi_ad9361_0_adc_enable_q1 }]
+
+    set_property HDL_ATTRIBUTE.MARK_DEBUG true [get_bd_nets {axi_ad9361_0_adc_valid_q1 }]
+
+    set_property HDL_ATTRIBUTE.MARK_DEBUG true [get_bd_nets {axi_ad9361_0_adc_valid_i1 }]
+
+    set_property HDL_ATTRIBUTE.MARK_DEBUG true [get_bd_nets {axi_ad9361_0_adc_enable_i1 }]
+
+    set_property HDL_ATTRIBUTE.MARK_DEBUG true [get_bd_nets {axi_ad9361_0_adc_enable_q0 }]
+
+    set_property HDL_ATTRIBUTE.MARK_DEBUG true [get_bd_nets {axi_ad9361_0_adc_valid_q0 }]
+
+    set_property HDL_ATTRIBUTE.MARK_DEBUG true [get_bd_nets {axi_ad9361_0_adc_enable_i0 }]
+    set_property HDL_ATTRIBUTE.MARK_DEBUG true [get_bd_nets {axi_ad9361_0_adc_valid_i0 }]
     save_bd_design
+
     validate_bd_design
+
+if 0 {
 
     ######################################################################
     #
@@ -94,7 +143,7 @@ if 0 {
     generate_target all [get_files $origin_dir/$proj_name/$proj_name.srcs/sources_1/bd/block_design/block_design.bd]
 
     # Generate HDL wrapper for the block design
-    make_wrapper -files [get_files $origin_dir/$proj_name/$proj_name.srcs/sources_1/bd/block_design/block_design.bd] -top
+    make_wrapper -files [get_fiQualquer coisa extra concluída será reportada no AS da semana que vem.les $origin_dir/$proj_name/$proj_name.srcs/sources_1/bd/block_design/block_design.bd] -top
     add_files -norecurse $origin_dir/$proj_name/$proj_name.srcs/sources_1/bd/block_design/hdl/block_design_wrapper.vhd
     update_compile_order -fileset sources_1
     update_compile_order -fileset sources_1
