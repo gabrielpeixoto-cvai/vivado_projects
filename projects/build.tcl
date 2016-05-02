@@ -30,8 +30,12 @@ set ::ad9361_mode "DATA_IF"
 # board: "VC707", "VC709"
 set ::board "VC707"
 
+# ethernet : "YES" or "NO"
+
+set ::eth "YES"
+
 # Vivado Project Name
-set proj_name "sdr_testbed"
+set proj_name "sdr_testbed_eth"
 
 ######################################################################
 # Create Vivado Project and Block Design
@@ -130,6 +134,8 @@ if 0 {
     save_bd_design
 
     validate_bd_design
+
+    }
 
 if 0 {
 
