@@ -189,7 +189,7 @@ begin
 
 	dma_dac : dac_dmaInterface
 	port map(
-		clk_fs	=> dac_clk,
+		clk_fs	=> axi_clk,
 		clk_axi	=> axi_clk,
 		rst			=> rst,
 
