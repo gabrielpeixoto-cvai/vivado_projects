@@ -129,7 +129,7 @@ begin
 	fifo_i0_i : native_fifo_8192x16
 	PORT MAP (
 		rst => rst,
-		wr_clk => dacClk,
+		wr_clk => axiClk,
 		rd_clk => dacClk,
 
 		wr_data_count  => i0_fifo_occ,
@@ -149,7 +149,7 @@ begin
 	fifo_q0_i : native_fifo_8192x16
 	PORT MAP (
 		rst => rst,
-		wr_clk => dacClk,
+		wr_clk => axiClk,
 		rd_clk => dacClk,
 
 		wr_data_count  => open,
@@ -173,7 +173,7 @@ begin
 	fifo_i1_i : native_fifo_8192x16
 	PORT MAP (
 		rst => rst,
-		wr_clk => dacClk,
+		wr_clk => axiClk,
 		rd_clk => dacClk,
 
 		wr_data_count  => open,
@@ -193,7 +193,7 @@ begin
 	fifo_q1_i : native_fifo_8192x16
 	PORT MAP (
 		rst => rst,
-		wr_clk => dacClk,
+		wr_clk => axiClk,
 		rd_clk => dacClk,
 
 		wr_data_count  => open,
@@ -221,10 +221,10 @@ begin
 	axc1_i_fifo_wr_en <= s_axis_axc1_i_tvalid; --and (not full_panic_flag);
 	axc1_q_fifo_wr_en <= s_axis_axc1_q_tvalid; --and (not full_panic_flag);
 
-	s_axis_axc0_i_tready <= tx_i0_valid and tx_i0_enable;
-	s_axis_axc0_q_tready <= tx_q0_valid and tx_q0_enable;
-	s_axis_axc1_i_tready <= tx_i1_valid and tx_i1_enable;
-	s_axis_axc1_q_tready <= tx_q1_valid and tx_q1_enable;
+	s_axis_axc0_i_tready <= tx_i0_enable;
+	s_axis_axc0_q_tready <= tx_q0_enable;
+	s_axis_axc1_i_tready <= tx_i1_enable;
+	s_axis_axc1_q_tready <= tx_q1_enable;
 
 
 
@@ -234,9 +234,9 @@ begin
 	--i1_rd_en <= iq_fifo_rd_enable and tx_i1_valid and tx_i1_enable;
 	--q1_rd_en <= iq_fifo_rd_enable and tx_q1_valid and tx_q1_enable;
 
-	i0_rd_en <= tx_i0_valid and tx_i0_enable;
-	q0_rd_en <= tx_q0_valid and tx_q0_enable;
-	i1_rd_en <= tx_i1_valid and tx_i1_enable;
-	q1_rd_en <= tx_q1_valid and tx_q1_enable;
+	i0_rd_en <= tx_i0_enable;
+	q0_rd_en <= tx_q0_enable;
+	i1_rd_en <= tx_i1_enable;
+	q1_rd_en <= tx_q1_enable;
 
 end Behavioral;
